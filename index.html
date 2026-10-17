@@ -4,12 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bedside — AI Standardized Patient</title>
+<meta name="description" content="Bedside is an AI standardized patient for medical students. Practice breaking bad news with a simulated patient who reacts like a person, then get a SPIKES debrief that quotes your own words.">
+<meta property="og:title" content="Bedside — AI standardized patient for breaking bad news">
+<meta property="og:description" content="Unlimited practice conversations for medical students. SPIKES-based feedback. A session costs cents, not $665.">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Bedside","applicationCategory":"EducationalApplication","operatingSystem":"Web","description":"AI standardized patient for medical communication skills training. Students practice delivering difficult diagnoses to a simulated patient with a hidden emotional state and receive SPIKES-protocol feedback.","audience":{"@type":"EducationalAudience","educationalRole":"student","audienceType":"Medical students, residents, nursing and PA students"},"featureList":["Voice conversation with a reactive simulated patient","SPIKES protocol scorecard with quoted feedback","Six scenarios across oncology, OB/GYN, neurology, pediatrics, internal medicine and critical care","Competency mapping to AAMC Core EPAs and ACGME ICS"],"offers":{"@type":"Offer","price":"0","priceCurrency":"USD","description":"Free for students; institutional plans for medical schools"}}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#f5f2ec; --surface:#ffffff; --ink:#2a2724; --muted:#7a746b; --line:#e6e1d8;
-    --accent:#2a2724; --sky:#86d3ec; --sky-soft:#d9f0f8; --warn:#b45309; --warn-soft:#fdf1e0; --bad:#b91c1c; --bad-soft:#fde8e8;
+    --accent:#2a2724; --sky:#a7d8e6; --sky-soft:#e3f2f7; --warn:#b45309; --warn-soft:#fdf1e0; --bad:#b91c1c; --bad-soft:#fde8e8;
     --student:#e9f6fb; --patient:#fff; --radius:12px; --shadow:0 1px 0 rgba(42,39,36,.03);
     --slab:'Roboto Slab',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace; --serif:'Source Serif 4',Georgia,serif;
   }
@@ -26,7 +33,9 @@
   textarea{resize:none}
   .wrap{max-width:1040px;margin:0 auto;padding:24px 16px 48px}
   header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:56px}
-  .brand{display:flex;align-items:center;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;cursor:pointer}
+  .back{display:inline-block;margin-right:12px;color:var(--muted);text-decoration:none;cursor:pointer;font-weight:500}
+  .back:hover{color:var(--ink)}
   .brand .mark{width:30px;height:30px;border-radius:50%;background:var(--sky);display:grid;place-items:center;color:var(--ink);font-family:var(--slab);font-weight:700}
   .brand h1{font-size:22px;font-weight:400}
   .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
@@ -99,7 +108,7 @@
   .stage.listening-live .halo{opacity:1;animation:halo 1.6s ease-in-out infinite}
   @keyframes halo{0%,100%{transform:scale(.96)}50%{transform:scale(1.04)}}
   svg#face{height:100%;width:auto;max-width:100%;position:relative;transform:scale(var(--lean,1));transform-origin:50% 60%;transition:transform .8s ease}
-  .startOverlay{position:absolute;inset:0;display:none;place-items:center;text-align:center;background:rgba(134,211,236,.78);backdrop-filter:blur(3px);z-index:2}
+  .startOverlay{position:absolute;inset:0;display:none;place-items:center;text-align:center;background:rgba(167,216,230,.8);backdrop-filter:blur(3px);z-index:2}
   .startOverlay.on{display:grid}
   .startOverlay .hint{color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
   .startOverlay button{font-size:16px;padding:14px 22px;border-radius:999px;background:var(--ink)}
@@ -161,14 +170,14 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
   <header class="top">
-    <div class="brand"><div class="mark">B</div><div><h1>Bedside</h1></div></div>
+    <a class="brand" id="brandHome" href="#" aria-label="Bedside home"><div class="mark">B</div><div><h1>Bedside</h1></div></a>
     <button class="gear" id="navSettings" title="Settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </header>
 
   <!-- HOME -->
-  <section class="screen active" id="home">
+  <section class="screen active" id="home" aria-label="Scenario library">
     <div class="hero">
       <h2>Practice the <b>conversation no one wants to have.</b> As many times as you need.</h2>
       <p>Talk to a simulated patient who reacts like a person. Get a SPIKES debrief that quotes your own words.</p>
@@ -188,6 +197,22 @@
     </div>
   </section>
 
+  <!-- SCHOOLS -->
+  <div class="modal" id="schools">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="tag">For medical schools</div><button class="ghost" id="closeSchools">✕</button></div>
+      <h3 style="font-size:24px;margin-bottom:12px">Unlimited reps. <b>A fraction of the cost.</b></h3>
+      <p style="font-family:var(--serif);font-size:15px;color:var(--muted);margin:0 0 14px">One standardized-patient simulation runs about $665 per resident. Bedside gives every student unlimited practice for cents per session, and gives faculty what they can't get today: a view of the whole cohort.</p>
+      <div class="comp" style="margin-bottom:16px">
+        <div><b>Cohort analytics</b>SPIKES averages by class, rotation and scenario.</div>
+        <div><b>Faculty review queue</b>Students flag sessions; faculty annotate the transcript.</div>
+        <div><b>Scenario authoring</b>Write cases in your own voice, with your own facts.</div>
+        <div><b>Privacy by design</b>No PHI. Simulated patients only. Browser-side keys.</div>
+      </div>
+      <button id="btnDemo">Request a pilot</button>
+    </div>
+  </div>
+
   <!-- SETTINGS -->
   <div class="modal" id="settings">
     <div class="modal-card">
@@ -204,9 +229,9 @@
   </div>
 
   <!-- ENCOUNTER -->
-  <section class="screen" id="encounter">
+  <section class="screen" id="encounter" aria-label="Patient encounter">
     <div class="encbar">
-      <div class="l"><b id="encName"></b> · <span id="encTitle"></span> · <a id="briefToggle" style="cursor:pointer;text-decoration:underline">hide brief</a></div>
+      <div class="l"><a id="backHome" class="back">← Scenarios</a><b id="encName"></b> · <span id="encTitle"></span> · <a id="briefToggle" style="cursor:pointer;text-decoration:underline">hide brief</a></div>
       <div style="display:flex;gap:8px"><button class="secondary" id="btnRestart">Restart</button><button id="btnEnd">End conversation →</button></div>
     </div>
     <div class="briefPanel card on" id="briefPanel">
@@ -264,7 +289,7 @@
   </section>
 
   <!-- DEBRIEF -->
-  <section class="screen" id="debrief">
+  <section class="screen" id="debrief" aria-label="Debrief">
     <div class="score-head">
       <div><div class="tag">Debrief · <span id="dbScenario"></span></div><h2 style="font-size:30px" id="dbHeadline">Scoring your conversation…</h2></div>
       <div class="big" id="dbOverall"></div>
@@ -280,6 +305,11 @@
         <div style="margin-top:14px"><b style="font-size:13px">What worked</b><ul class="clean" id="dbStrengths"></ul></div>
         <div style="margin-top:10px"><b style="font-size:13px">Practice next time</b><p id="dbNext" style="margin:4px 0 0;font-size:14px"></p></div>
       </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3 style="font-size:18px;margin-bottom:4px">Patient trust over the conversation</h3>
+      <div class="hint" style="margin:0 0 10px">How safe the patient felt after each thing you said. The dip is where to look first.</div>
+      <div id="trustChart"></div>
     </div>
     <div class="card" style="margin-top:16px">
       <h3 style="font-size:18px;margin-bottom:12px">Key moments</h3>
@@ -308,8 +338,8 @@
     </div>
     <div class="err" id="dbErr"></div>
   </section>
-  <footer class="foot">Simulated patients only. Nothing leaves your browser except the conversation text sent to the model.</footer>
-</div>
+  <footer class="foot">Simulated patients only. Nothing leaves your browser except the conversation text sent to the model. · <a id="schoolsLink" style="cursor:pointer;text-decoration:underline;color:inherit">For medical schools</a></footer>
+</main>
 
 <script>
 /* ---------------- scenarios ---------------- */
@@ -771,6 +801,10 @@ function renderProgress(){
 function toast(msg){ let t=document.querySelector('.toast'); if(!t){ t=document.createElement('div'); t.className='toast'; document.body.appendChild(t);} t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2200); }
 $('navSettings').onclick=()=>$('settings').classList.add('on');
 $('closeSettings').onclick=()=>$('settings').classList.remove('on');
+$('schoolsLink').onclick=()=>$('schools').classList.add('on');
+$('closeSchools').onclick=()=>$('schools').classList.remove('on');
+$('schools').onclick=e=>{ if(e.target===$('schools')) $('schools').classList.remove('on'); };
+$('btnDemo').onclick=()=>{ $('btnDemo').textContent='Request received ✓'; $('btnDemo').disabled=true; toast('Pilot request noted'); };
 $('settings').onclick=e=>{ if(e.target===$('settings')) $('settings').classList.remove('on'); };
 $('saveKey').onclick=()=>{ const v=$('apikey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_key', v); $('apikey').value='••••••••••••••••'; } };
 $('saveElKey').onclick=()=>{ const v=$('elkey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_elkey', v); $('elkey').value='••••••••••••••••'; EL.voices=null; loadElVoices(); } };
@@ -804,6 +838,7 @@ function beginVisit(){
   $('mic').disabled=false; $('send').disabled=false;
   const first = { say: sc.opening, emotion:'anxious', trust:55, inner:'Please let this be nothing.' };
   S.messages.push({role:'assistant', content: JSON.stringify(first)});
+  S.trustLog=[first.trust];
   addLive('patient', sc.name, first.say);
   setState(first.emotion, first.trust, first.inner);
   setFaceState('listening');
@@ -823,6 +858,7 @@ async function sendStudent(){
     S.messages.push({role:'assistant', content: JSON.stringify(p)});
     pend.innerHTML=`<div class="who">${escapeHtml(S.scenario.name)}</div>`+escapeHtml(p.say);
     setState(p.emotion||S.emotion, Math.max(0,Math.min(100,+p.trust||S.trust)), p.inner||'');
+    (S.trustLog=S.trustLog||[]).push(S.trust);
     speak(p.say, p.emotion);
   } catch(e) {
     S.messages.pop(); pend.remove(); $('encErr').textContent = e.message; $('encErr').style.display='block'; setFaceState('listening');
@@ -835,6 +871,8 @@ $('instrToggle').onchange=e=>$('overlay').classList.toggle('on', e.target.checke
 $('typeToggle').onclick=()=>{ const on=$('composer').classList.toggle('on'); $('typeToggle').textContent = on?'hide typing':'type instead'; if(on) $('input').focus(); };
 $('briefToggle').onclick=()=>{ const on=$('briefPanel').classList.toggle('on'); $('briefToggle').textContent = on?'hide brief':'show brief'; };
 $('btnRestart').onclick=()=>startScenario(S.scenario.id);
+$('backHome').onclick=()=>{ show('home'); renderScenarios(); };
+$('brandHome').onclick=e=>{ e.preventDefault(); show('home'); renderScenarios(); };
 $('btnEnd').onclick=endEncounter;
 
 /* ---------------- debrief ---------------- */
@@ -873,6 +911,19 @@ function renderDebrief(d){
       <div class="lbl">What the patient heard</div><p>${escapeHtml(m.what_patient_heard||'')}</p>
       <div class="lbl" style="margin-top:8px">${m.kind==='good'?'Why it worked':'Try instead'}</div><p>${escapeHtml(m.better||'')}</p>
     </div>`).join('');
+  const tl=S.trustLog||[]; const W=640,H=140,P=24;
+  if (tl.length>1){
+    const x=i=>P+(i/(tl.length-1))*(W-2*P), y=v=>H-P-(v/100)*(H-2*P);
+    const pts=tl.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    const dots=tl.map((v,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4" fill="${v<40?'var(--bad)':v<70?'var(--warn)':'var(--sky)'}" stroke="#fff" stroke-width="1.5"/>`).join('');
+    const min=Math.min(...tl), mi=tl.indexOf(min);
+    $('trustChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img" aria-label="Patient trust after each turn">
+      <line x1="${P}" y1="${y(70)}" x2="${W-P}" y2="${y(70)}" stroke="#e6e1d8" stroke-dasharray="3 4"/><line x1="${P}" y1="${y(40)}" x2="${W-P}" y2="${y(40)}" stroke="#e6e1d8" stroke-dasharray="3 4"/>
+      <text x="${W-P}" y="${y(70)-4}" text-anchor="end" font-size="10" fill="#7a746b" font-family="IBM Plex Mono">OPEN</text><text x="${W-P}" y="${y(40)-4}" text-anchor="end" font-size="10" fill="#7a746b" font-family="IBM Plex Mono">SHUT DOWN</text>
+      <polyline points="${pts}" fill="none" stroke="#2a2724" stroke-width="2" stroke-linejoin="round"/>${dots}
+      <text x="${x(mi).toFixed(1)}" y="${(y(min)+18).toFixed(1)}" text-anchor="middle" font-size="10" fill="#7a746b" font-family="IBM Plex Mono">LOW ${min}</text>
+    </svg>`;
+  } else $('trustChart').innerHTML='<div class="hint">Not enough turns to chart.</div>';
   const comp=[
     ['AAMC Core EPA 1','Gather a history and perform a physical exam — eliciting the patient\'s perspective', (d.spikes||{}).Perception],
     ['ACGME ICS1','Communicate effectively with patients and families across a broad range of socioeconomic and cultural backgrounds', (d.spikes||{}).Empathy],
