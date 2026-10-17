@@ -53,6 +53,14 @@
   .briefPanel.on{display:grid;gap:12px}
   @media(min-width:760px){.briefPanel.on{grid-template-columns:1fr 1fr}}
   .briefPanel b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+  .encGrid{display:grid;gap:14px}
+  @media(min-width:900px){.encGrid{grid-template-columns:1fr 340px}}
+  .livePanel{height:62vh;min-height:380px;overflow:auto;padding:14px;display:flex;flex-direction:column}
+  .livePanel .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:10px}
+  .livePanel .log{flex:1}
+  .livePanel .msg{max-width:92%}
+  .typing{display:inline-flex;gap:4px}.typing i{width:6px;height:6px;border-radius:50%;background:#aaa;animation:b 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+  @keyframes b{0%,80%,100%{opacity:.3}40%{opacity:1}}
   .stage{position:relative;background:linear-gradient(180deg,#eef0ea 0%,#e4e7df 100%);border-radius:24px;height:62vh;min-height:380px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line)}
   .halo{position:absolute;width:52vh;height:52vh;border-radius:50%;opacity:0;transition:opacity .4s;background:radial-gradient(circle,rgba(15,110,86,.18),rgba(15,110,86,0) 70%)}
   .stage.listening-live .halo{opacity:1;animation:halo 1.6s ease-in-out infinite}
@@ -156,41 +164,50 @@
       <div><b>What you know</b><div id="ptFacts"></div></div>
     </div>
 
+    <div class="encGrid">
     <div class="stage" id="stage">
       <div class="halo"></div>
       <svg id="face" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <defs>
-          <clipPath id="clipL"><ellipse cx="155" cy="215" rx="26" ry="26"/></clipPath>
-          <clipPath id="clipR"><ellipse cx="245" cy="215" rx="26" ry="26"/></clipPath>
+          <clipPath id="clipL"><path d="M127,215 C139,194 171,194 183,215 C171,236 139,236 127,215 Z"/></clipPath>
+          <clipPath id="clipR"><path d="M217,215 C229,194 261,194 273,215 C261,236 229,236 217,215 Z"/></clipPath>
         </defs>
         <g id="shoulders"><g id="shouldersInner">
-          <path id="shirt" d="M30,500 C30,425 105,392 200,392 C295,392 370,425 370,500 Z" fill="#5b7c99" stroke="#2b2b2b" stroke-width="4" stroke-linejoin="round"/>
-          <path id="collar" d="M170,392 L200,428 L230,392" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linejoin="round"/>
+          <path id="shirt" d="M28,500 C28,428 100,394 200,394 C300,394 372,428 372,500 Z" fill="#5b7c99" stroke="#3a2f2a" stroke-width="3" stroke-linejoin="round"/>
+          <path id="collar" d="M168,394 C180,420 190,432 200,436 C210,432 220,420 232,394" fill="none" stroke="#3a2f2a" stroke-width="3" stroke-linejoin="round"/>
         </g></g>
-        <rect id="neck" x="172" y="296" width="56" height="110" rx="22" fill="#f1c9a5" stroke="#2b2b2b" stroke-width="4"/>
+        <path id="neck" d="M172,300 L172,392 C172,404 186,412 200,412 C214,412 228,404 228,392 L228,300 Z" fill="#f1c9a5" stroke="#3a2f2a" stroke-width="3"/>
+        <path id="neckShade" d="M172,300 L228,300 L228,330 C214,342 186,342 172,330 Z" fill="#000" opacity=".12"/>
         <g id="head">
-          <ellipse id="hairBack" cx="200" cy="225" rx="122" ry="138" fill="#2d2420"/>
-          <ellipse id="earL" cx="100" cy="228" rx="15" ry="22" fill="#f1c9a5" stroke="#2b2b2b" stroke-width="4"/>
-          <ellipse id="earR" cx="300" cy="228" rx="15" ry="22" fill="#f1c9a5" stroke="#2b2b2b" stroke-width="4"/>
-          <ellipse id="skull" cx="200" cy="222" rx="102" ry="120" fill="#f1c9a5" stroke="#2b2b2b" stroke-width="4"/>
-          <path id="hairTop" d="M100,160 C98,106 150,82 200,84 C250,82 302,106 300,160 C284,128 250,114 200,116 C150,114 116,128 100,160 Z" fill="#2d2420" stroke="#2b2b2b" stroke-width="4" stroke-linejoin="round"/>
-          <ellipse id="blushL" cx="130" cy="262" rx="18" ry="10" fill="#f0a08a" opacity=".45"/>
-          <ellipse id="blushR" cx="270" cy="262" rx="18" ry="10" fill="#f0a08a" opacity=".45"/>
+          <path id="hairBack" d="M72,240 C72,112 134,62 200,62 C266,62 328,112 328,240 C328,300 326,370 334,412 L66,412 C74,370 72,300 72,240 Z" fill="#2d2420"/>
+          <ellipse id="earL" cx="101" cy="228" rx="14" ry="21" fill="#f1c9a5" stroke="#3a2f2a" stroke-width="3"/>
+          <ellipse id="earR" cx="299" cy="228" rx="14" ry="21" fill="#f1c9a5" stroke="#3a2f2a" stroke-width="3"/>
+          <path id="skull" d="M200,94 C264,94 302,150 302,224 C302,292 260,348 200,348 C140,348 98,292 98,224 C98,150 136,94 200,94 Z" fill="#f1c9a5" stroke="#3a2f2a" stroke-width="3"/>
+          <path id="cheekShade" d="M110,250 C130,300 170,330 200,332 C230,330 270,300 290,250 C270,316 230,340 200,340 C170,340 130,316 110,250 Z" fill="#000" opacity=".06"/>
+          <path id="hairTop" d="M100,175 C98,108 148,76 200,76 C252,76 302,108 300,175 C286,148 266,126 240,126 C224,126 214,146 200,140 C184,132 154,120 130,146 C118,156 108,166 100,175 Z" fill="#2d2420" stroke="#3a2f2a" stroke-width="3" stroke-linejoin="round"/>
           <g id="features">
-            <path id="browL" d="M122,174 Q152,160 182,172" fill="none" stroke="#2d2420" stroke-width="10" stroke-linecap="round"/>
-            <path id="browR" d="M218,172 Q248,160 278,174" fill="none" stroke="#2d2420" stroke-width="10" stroke-linecap="round"/>
+            <path id="browL" d="M127,172 Q154,157 183,168" fill="none" stroke="#2d2420" stroke-width="6.5" stroke-linecap="round"/>
+            <path id="browR" d="M217,168 Q246,157 273,172" fill="none" stroke="#2d2420" stroke-width="6.5" stroke-linecap="round"/>
             <g id="eyeL">
-              <ellipse cx="155" cy="215" rx="26" ry="26" fill="#fff" stroke="#2b2b2b" stroke-width="4"/>
-              <g clip-path="url(#clipL)"><g id="irisL"><circle cx="155" cy="215" r="13" fill="#4a3b2f"/><circle cx="155" cy="215" r="6.5" fill="#1a1a1a"/><circle cx="149" cy="208" r="4.5" fill="#fff"/></g></g>
-              <ellipse id="lidL" cx="155" cy="214" rx="29" ry="29" fill="#f1c9a5"/>
+              <path d="M127,215 C139,194 171,194 183,215 C171,236 139,236 127,215 Z" fill="#fff"/>
+              <g clip-path="url(#clipL)"><g id="irisL"><circle cx="155" cy="215" r="12.5" fill="#4a3b2f"/><circle cx="155" cy="215" r="6" fill="#161616"/><circle cx="150" cy="209.5" r="3.6" fill="#fff"/></g></g>
+              <path id="lidL" d="M125,215 C138,192 172,192 185,215 C172,238 138,238 125,215 Z" fill="#f1c9a5"/>
+              <path d="M127,215 C139,194 171,194 183,215" fill="none" stroke="#2b221e" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M127,215 C139,236 171,236 183,215" fill="none" stroke="#3a2f2a" stroke-width="1.6" opacity=".7"/>
             </g>
             <g id="eyeR">
-              <ellipse cx="245" cy="215" rx="26" ry="26" fill="#fff" stroke="#2b2b2b" stroke-width="4"/>
-              <g clip-path="url(#clipR)"><g id="irisR"><circle cx="245" cy="215" r="13" fill="#4a3b2f"/><circle cx="245" cy="215" r="6.5" fill="#1a1a1a"/><circle cx="239" cy="208" r="4.5" fill="#fff"/></g></g>
-              <ellipse id="lidR" cx="245" cy="214" rx="29" ry="29" fill="#f1c9a5"/>
+              <path d="M217,215 C229,194 261,194 273,215 C261,236 229,236 217,215 Z" fill="#fff"/>
+              <g clip-path="url(#clipR)"><g id="irisR"><circle cx="245" cy="215" r="12.5" fill="#4a3b2f"/><circle cx="245" cy="215" r="6" fill="#161616"/><circle cx="240" cy="209.5" r="3.6" fill="#fff"/></g></g>
+              <path id="lidR" d="M215,215 C228,192 262,192 275,215 C262,238 228,238 215,215 Z" fill="#f1c9a5"/>
+              <path d="M217,215 C229,194 261,194 273,215" fill="none" stroke="#2b221e" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M217,215 C229,236 261,236 273,215" fill="none" stroke="#3a2f2a" stroke-width="1.6" opacity=".7"/>
             </g>
-            <path id="nose" d="M200,232 Q188,262 204,265" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
-            <path id="mouth" d="M178,288 Q200,284 222,288 Q200,292 178,288 Z" fill="#8b2f3a" stroke="#2b2b2b" stroke-width="4" stroke-linejoin="round"/>
+            <g id="glasses" style="display:none" fill="none" stroke="#2b2b2b" stroke-width="3">
+              <rect x="122" y="193" width="66" height="44" rx="14"/><rect x="212" y="193" width="66" height="44" rx="14"/>
+              <path d="M188,212 Q200,206 212,212"/><path d="M122,210 L104,206"/><path d="M278,210 L296,206"/>
+            </g>
+            <path id="nose" d="M201,236 C195,252 190,259 197,264 C203,267 208,263 207,258" fill="none" stroke="#3a2f2a" stroke-width="2.8" stroke-linecap="round"/>
+            <path id="mouth" d="M178,288 Q200,284 222,288 Q200,292 178,288 Z" fill="#b5555f" stroke="#6b3038" stroke-width="2.5" stroke-linejoin="round"/>
           </g>
         </g>
       </svg>
@@ -199,6 +216,8 @@
         <div class="meter"><i id="trustBar"></i></div>
         <div class="note" id="trustNote">Trust</div>
       </div>
+    </div>
+    <div class="card livePanel"><div class="lbl">Transcript</div><div class="log" id="liveLog"></div></div>
     </div>
 
     <div class="status" id="status"><b>Listening</b></div>
@@ -286,7 +305,7 @@ const SCENARIOS = [
   },
   {
     id:'hale', name:'Robert Hale', age:72, pronouns:'he/him', voice:'male',
-    look:{skin:'#e8b894', hair:'#b8b4ad', shirt:'#6b7a5a', hairStyle:'short', iris:'#4f6b7a'},
+    look:{skin:'#e8b894', hair:'#b8b4ad', shirt:'#6b7a5a', hairStyle:'short', iris:'#4f6b7a', glasses:true},
     difficulty:'Hard', title:'Dementia diagnosis and losing the keys',
     teaser:'A proud man who has driven for 50 years. He can\'t anymore.',
     role:'You are a student in the neurology clinic. You need to tell Mr. Hale that his testing is consistent with Alzheimer\'s disease, and that he should stop driving. His wife Joan is in the waiting room and he asked that she not come in.',
@@ -432,8 +451,8 @@ function mouthPath(w, open, corner, press){
   const cx=200, cy=288;
   if (press) { w=Math.max(12,w-4); }
   const y = cy - corner;
-  const top = cy - 3 + corner*0.7 - open*0.3;
-  const bot = cy + 3 + corner*0.7 + open*1.4;
+  const top = cy - 4 + corner*0.7 - open*0.3;
+  const bot = cy + 5 + corner*0.7 + open*1.4;
   return `M${(cx-w).toFixed(1)},${y.toFixed(1)} Q${cx},${top.toFixed(1)} ${(cx+w).toFixed(1)},${y.toFixed(1)} Q${cx},${bot.toFixed(1)} ${(cx-w).toFixed(1)},${y.toFixed(1)} Z`;
 }
 function renderFace(){
@@ -460,16 +479,16 @@ function renderFace(){
 }
 function applyLook(look){
   const skin=look.skin, hair=look.hair;
-  ['skull','earL','earR','lidL','lidR'].forEach(id=>$(id).setAttribute('fill',skin));
-  $('neck').setAttribute('fill',skin);
+  ['skull','earL','earR','lidL','lidR','neck'].forEach(id=>$(id).setAttribute('fill',skin));
   ['hairBack','hairTop'].forEach(id=>$(id).setAttribute('fill',hair));
   ['browL','browR'].forEach(id=>$(id).setAttribute('stroke',hair));
   $('shirt').setAttribute('fill',look.shirt);
   document.querySelectorAll('#irisL circle:first-child,#irisR circle:first-child').forEach(c=>c.setAttribute('fill',look.iris));
   $('hairBack').style.display = look.hairStyle==='long' ? '' : 'none';
+  $('glasses').style.display = look.glasses ? '' : 'none';
   $('hairTop').setAttribute('d', look.hairStyle==='long'
-    ? 'M100,160 C98,106 150,82 200,84 C250,82 302,106 300,160 C284,128 250,114 200,116 C150,114 116,128 100,160 Z'
-    : 'M106,150 C110,100 150,86 200,88 C250,86 290,100 294,150 C280,122 250,110 200,112 C150,110 120,122 106,150 Z');
+    ? 'M100,175 C98,108 148,76 200,76 C252,76 302,108 300,175 C286,148 266,126 240,126 C224,126 214,146 200,140 C184,132 154,120 130,146 C118,156 108,166 100,175 Z'
+    : 'M104,168 C102,106 148,80 200,80 C252,80 298,106 296,168 C282,138 252,120 200,120 C148,120 118,138 104,168 Z');
 }
 let blinkTimer=null, driftTimer=null;
 function blink(slow){
@@ -670,6 +689,11 @@ $('btnHome').onclick=()=>{ stopSpeech(); stopRec(); show('home'); };
 
 /* ---------------- ui: encounter ---------------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function addLive(cls, who, text){
+  const d=document.createElement('div'); d.className='msg '+cls;
+  d.innerHTML=`<div class="who">${escapeHtml(who)}</div>`+(text===null?'<span class="typing"><i></i><i></i><i></i></span>':escapeHtml(text));
+  $('liveLog').appendChild(d); const lp=document.querySelector('.livePanel'); lp.scrollTop=lp.scrollHeight; return d;
+}
 function startScenario(id){
   const sc = SCENARIOS.find(s=>s.id===id); S.scenario=sc; S.messages=[]; S.usage={in:0,out:0};
   $('encTitle').textContent = sc.title; $('encName').textContent = sc.name+', '+sc.age;
@@ -679,6 +703,7 @@ function startScenario(id){
   renderVoicePicker(sc);
   const first = { say: sc.opening, emotion:'anxious', trust:55, inner:'Please let this be nothing.' };
   S.messages.push({role:'assistant', content: JSON.stringify(first)});
+  $('liveLog').innerHTML=''; addLive('patient', sc.name, first.say);
   show('encounter');
   setState(first.emotion, first.trust, first.inner);
   setFaceState('listening');
@@ -688,16 +713,18 @@ async function sendStudent(){
   const text = $('input').value.trim(); if (!text || S.busy) return;
   $('input').value=''; $('encErr').style.display='none';
   S.messages.push({role:'user', content:text});
+  addLive('student','You',text); const pend=addLive('patient', S.scenario.name, null);
   S.busy=true; $('send').disabled=true; $('mic').disabled=true;
   stopSpeech(); setFaceState('thinking');
   try {
     const raw = await claude({system: patientSystem(S.scenario), messages: S.messages, maxTokens: 600, effort:'low'});
     let p; try { p = parseJSON(raw); } catch { p = {say: raw, emotion:S.emotion, trust:S.trust, inner:''}; }
     S.messages.push({role:'assistant', content: JSON.stringify(p)});
+    pend.innerHTML=`<div class="who">${escapeHtml(S.scenario.name)}</div>`+escapeHtml(p.say);
     setState(p.emotion||S.emotion, Math.max(0,Math.min(100,+p.trust||S.trust)), p.inner||'');
     speak(p.say, p.emotion);
   } catch(e) {
-    S.messages.pop(); $('encErr').textContent = e.message; $('encErr').style.display='block'; setFaceState('listening');
+    S.messages.pop(); pend.remove(); $('encErr').textContent = e.message; $('encErr').style.display='block'; setFaceState('listening');
   } finally { S.busy=false; $('send').disabled=false; $('mic').disabled=false; }
 }
 $('send').onclick=sendStudent;
