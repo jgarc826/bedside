@@ -89,7 +89,7 @@
   .keyrow{display:flex;gap:10px;align-items:center;margin-top:10px}
   .keyrow input{flex:1}
   .hint{font-size:13px;color:var(--muted);margin-top:8px}
-  .hero{margin-bottom:48px}
+  .hero{margin-bottom:28px}
   .hero h2{font-size:40px;line-height:1.15;margin-bottom:12px;max-width:820px}
   .hero p{color:var(--muted);max-width:640px;margin:0;font-family:var(--serif);font-size:17px}
   .err{background:var(--bad-soft);color:var(--bad);padding:10px 12px;border-radius:10px;font-size:13px;margin-top:10px;display:none}
@@ -186,15 +186,7 @@
 
   <!-- HOME -->
   <section class="screen active" id="home" aria-label="Scenario library">
-    <div class="hero2">
-      <div class="hero2-text">
-        <h2>Practice the <b>conversation no one wants to have.</b> As many times as you need.</h2>
-        <p>Talk to a simulated patient who reacts like a person. Get a SPIKES debrief that quotes your own words.</p>
-        <div class="cta"><button id="btnHeroStart">Start a practice visit →</button><span class="hint" id="ctaHint"></span></div>
-      </div>
-      <div class="hero2-face" id="heroFace" aria-hidden="true"></div>
-    </div>
-    <div class="tag" style="margin-bottom:12px">Choose a patient</div>
+    <div class="hero"><h2 style="font-size:32px">Choose a <b>patient.</b></h2></div>
     <div class="grid cols-3" id="scenarios"></div>
     <a class="more" id="moreLink">More scenarios (3)</a>
     <div class="grid cols-3" id="scenariosMore" style="display:none;margin-top:16px"></div>
@@ -794,13 +786,12 @@ function renderScenarios(){
   $('scenariosMore').innerHTML = SCENARIOS.filter(x=>!top.includes(x)).map(card).join('');
   document.querySelectorAll('.scenario').forEach(el=>{
     el.onclick=()=>startScenario(el.dataset.id);
-    el.onfocus=el.onmouseenter=()=>{ if(SELECTED===el.dataset.id) return; SELECTED=el.dataset.id; document.querySelectorAll('.scenario').forEach(x=>x.classList.toggle('selected',x===el)); renderHeroFace(); };
+    el.onfocus=el.onmouseenter=()=>{ if(SELECTED===el.dataset.id) return; SELECTED=el.dataset.id; document.querySelectorAll('.scenario').forEach(x=>x.classList.toggle('selected',x===el)); };
     el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); startScenario(el.dataset.id); } };
     const t=el.querySelector('.thumb'); thumb(t, SCENARIOS.find(s=>s.id===el.dataset.id).look);
   });
   $('apikey').value = localStorage.getItem('bedside_key') ? '••••••••••••••••' : '';
   $('elkey').value = localStorage.getItem('bedside_elkey') ? '••••••••••••••••' : '';
-  renderHeroFace();
 }
 let heroBlink=null;
 async function renderHeroFace(){
@@ -811,7 +802,6 @@ async function renderHeroFace(){
   clearInterval(heroBlink);
   heroBlink=setInterval(()=>{ const el=$('heroEyes'); if(!el) return; el.innerHTML=ec; setTimeout(()=>{ el.innerHTML=e; },120); }, 3200+Math.random()*2000);
 }
-$('btnHeroStart').onclick=()=>startScenario(SELECTED);
 $('moreLink').onclick=()=>{ const m=$('scenariosMore'); const open=m.style.display==='none'; m.style.display=open?'':'none'; $('moreLink').textContent=open?'Fewer scenarios':'More scenarios (3)'; };
 document.addEventListener('keydown', e=>{ if (e.key==='Enter' && $('home').classList.contains('active') && !['INPUT','TEXTAREA','BUTTON','A'].includes(document.activeElement.tagName) && !document.activeElement.classList.contains('scenario')) startScenario(SELECTED); });
 function renderProgress(){
