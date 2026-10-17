@@ -66,6 +66,9 @@
   .stage.listening-live .halo{opacity:1;animation:halo 1.6s ease-in-out infinite}
   @keyframes halo{0%,100%{transform:scale(.96)}50%{transform:scale(1.04)}}
   svg#face{height:100%;width:auto;max-width:100%;position:relative;transform:scale(var(--lean,1));transform-origin:50% 60%;transition:transform .8s ease}
+  .startOverlay{position:absolute;inset:0;display:none;place-items:center;text-align:center;background:rgba(251,250,247,.72);backdrop-filter:blur(3px);z-index:2}
+  .startOverlay.on{display:grid}
+  .startOverlay button{font-size:16px;padding:14px 22px;border-radius:999px;background:var(--accent)}
   .overlay{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:230px;font-size:13px;display:none}
   .overlay.on{display:block}
   .overlay .emo{font-weight:600;font-size:14px}
@@ -151,10 +154,10 @@
   <!-- ENCOUNTER -->
   <section class="screen" id="encounter">
     <div class="encbar">
-      <div class="l"><b id="encName"></b> · <span id="encTitle"></span> · <a id="briefToggle" style="cursor:pointer;text-decoration:underline">show brief</a></div>
+      <div class="l"><b id="encName"></b> · <span id="encTitle"></span> · <a id="briefToggle" style="cursor:pointer;text-decoration:underline">hide brief</a></div>
       <div style="display:flex;gap:8px"><button class="secondary" id="btnRestart">Restart</button><button id="btnEnd">End conversation →</button></div>
     </div>
-    <div class="briefPanel card" id="briefPanel">
+    <div class="briefPanel card on" id="briefPanel">
       <div><b>Your role</b><div id="ptRole"></div></div>
       <div><b>What you know</b><div id="ptFacts"></div></div>
     </div>
@@ -162,6 +165,7 @@
     <div class="encGrid">
     <div class="stage" id="stage">
       <div class="halo"></div>
+      <div class="startOverlay" id="startOverlay"><button id="btnStart">Click to start the visit</button><div class="hint" style="margin-top:8px">You'll knock and enter. The patient speaks first.</div></div>
       <svg id="face" viewBox="90 100 824 980" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <g id="shoulders"><g id="shouldersInner">
           <path id="neck" d="M447,800 L447,935 C470,965 534,965 557,935 L557,800" fill="#fff" stroke="#000" stroke-width="22" stroke-linejoin="round"/>
@@ -274,11 +278,11 @@ const SCENARIOS = [
   {
     id:'hale', name:'Robert Hale', age:72, pronouns:'he/him', voice:'male',
     look:{face:10, hair:47, nose:5, glasses:2},
-    difficulty:'Hard', title:'Dementia diagnosis and losing the keys',
-    teaser:'A proud man who has driven for 50 years. He can\'t anymore.',
-    role:'You are a student in the neurology clinic. You need to tell Mr. Hale that his testing is consistent with Alzheimer\'s disease, and that he should stop driving. His wife Joan is in the waiting room and he asked that she not come in.',
-    facts:'MoCA 19/30, MRI with hippocampal atrophy, neuropsych testing consistent with mild-stage Alzheimer\'s dementia. Two minor fender-benders in the last year. Joan has privately told the clinic she is scared to ride with him.',
-    persona:`You are Robert Hale, 72, a retired long-haul truck driver. You drove professionally for 40 years without a serious accident and you are proud of it. You came in because Joan pushed you to, and you think everyone is making a big deal out of "normal forgetting." You are gruff and dry, and you deflect with understatement when something scares you. You never make fun of your own memory. Driving means independence to you; losing it feels like being told you're done. If someone treats you like a child or rushes you, you get angry and shut down. If someone is straight with you and respects you, you will eventually admit you've been scared too.`,
+    difficulty:'Hard', title:'Dementia diagnosis',
+    teaser:'His tests confirm Alzheimer\'s. He thinks it\'s normal forgetting.',
+    role:'You are a student in the neurology clinic. You need to tell Mr. Hale that his testing is consistent with Alzheimer\'s disease. His wife Joan is in the waiting room and he asked that she not come in.',
+    facts:'MoCA 19/30, MRI with hippocampal atrophy, neuropsych testing consistent with mild-stage Alzheimer\'s dementia. Treatment options and support resources will be discussed with the attending afterward.',
+    persona:`You are Robert Hale, 72, a retired long-haul truck driver. You are proud, independent, and used to handling things yourself. You came in because Joan pushed you to, and you think everyone is making a big deal out of "normal forgetting." You are gruff and dry, and you deflect with understatement when something scares you. You never make fun of your own memory. Being told your mind is failing feels like being told you're done. If someone treats you like a child or rushes you, you get angry and shut down. If someone is straight with you and respects you, you will eventually admit you've been scared too.`,
     opening:`Alright, doc. Let's get this over with. Joan's out in the waiting room convinced something's wrong with me. So what did the tests say?`
   }
 ];
@@ -660,14 +664,26 @@ function startScenario(id){
   $('input').value=''; $('encErr').style.display='none'; $('interim').textContent='';
   applyLook(sc.look);
   renderVoicePicker(sc);
+  $('liveLog').innerHTML='';
+  show('encounter');
+  setState('calm', 60, '');
+  S.faceState='listening'; $('status').innerHTML='<b>Ready</b>';
+  $('mic').disabled=true; $('send').disabled=true;
+  $('startOverlay').classList.add('on');
+  stopSpeech();
+}
+function beginVisit(){
+  const sc=S.scenario;
+  $('startOverlay').classList.remove('on');
+  $('mic').disabled=false; $('send').disabled=false;
   const first = { say: sc.opening, emotion:'anxious', trust:55, inner:'Please let this be nothing.' };
   S.messages.push({role:'assistant', content: JSON.stringify(first)});
-  $('liveLog').innerHTML=''; addLive('patient', sc.name, first.say);
-  show('encounter');
+  addLive('patient', sc.name, first.say);
   setState(first.emotion, first.trust, first.inner);
   setFaceState('listening');
-  setTimeout(()=>speak(first.say, first.emotion), 400);
+  setTimeout(()=>speak(first.say, first.emotion), 300);
 }
+$('btnStart').onclick=beginVisit;
 async function sendStudent(){
   const text = $('input').value.trim(); if (!text || S.busy) return;
   $('input').value=''; $('encErr').style.display='none';
