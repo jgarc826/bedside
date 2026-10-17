@@ -1,0 +1,17 @@
+# Bedside — AI standardized patient
+
+Practice breaking bad news to a patient who reacts like a real person, then get a SPIKES scorecard that quotes your own words back to you.
+
+Built in one afternoon at the DiversaTech hackathon (UC Berkeley, Oct 17 2026).
+
+## Run it
+
+Open `index.html` in Chrome, paste an Anthropic API key on the home screen, pick a scenario, and talk.
+
+No backend, no build step. Voice input and output use the browser's Web Speech API. The patient and the grader are two prompts to the Claude API called directly from the browser. Your key stays in your browser's local storage.
+
+## Why
+
+Med schools pay roughly $100–200 per student per practice encounter with a paid actor (a "standardized patient"). Students get one to three reps in four years. A Bedside session costs a few cents.
+
+See `PITCH.md` for the pitch and demo flow.

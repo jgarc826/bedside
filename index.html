@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bedside — AI Standardized Patient</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f4ef; --surface:#ffffff; --ink:#1b1f24; --muted:#6b7280; --line:#e6e2d9;
+    --accent:#0f6e56; --accent-soft:#e3f1ec; --warn:#b45309; --warn-soft:#fdf1e0; --bad:#b91c1c; --bad-soft:#fde8e8;
+    --student:#eef2ff; --patient:#fff; --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(27,31,36,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;letter-spacing:-.01em;margin:0}
+  button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;background:var(--ink);color:#fff;font-weight:500}
+  button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  button.ghost{background:transparent;color:var(--muted);padding:6px 10px}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  input,textarea{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);width:100%}
+  textarea{resize:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
+  header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center;color:#fff;font-family:Fraunces,serif;font-weight:600}
+  .brand h1{font-size:20px}
+  .tag{font-size:12px;color:var(--muted);font-weight:500}
+  .screen{display:none}.screen.active{display:block}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+  .grid{display:grid;gap:16px}
+  @media(min-width:760px){.grid.cols-3{grid-template-columns:repeat(3,1fr)} .grid.cols-2{grid-template-columns:1fr 1fr}}
+  .scenario{cursor:pointer;transition:transform .12s,border-color .12s}
+  .scenario:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .scenario .diff{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:999px;display:inline-block;margin-bottom:10px}
+  .scenario h3{font-size:19px;margin-bottom:6px}
+  .scenario p{margin:0;color:var(--muted);font-size:14px}
+  .keyrow{display:flex;gap:10px;align-items:center;margin-top:10px}
+  .keyrow input{flex:1}
+  .hint{font-size:13px;color:var(--muted);margin-top:8px}
+  .hero{margin-bottom:28px}
+  .hero h2{font-size:34px;line-height:1.15;margin-bottom:8px}
+  .hero p{color:var(--muted);max-width:620px;margin:0}
+
+  /* encounter */
+  .enc{display:grid;gap:16px}
+  @media(min-width:900px){.enc{grid-template-columns:300px 1fr}}
+  .ptcard .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#d9e6e1,#b9cdc5);display:grid;place-items:center;font-family:Fraunces,serif;font-size:26px;color:#2f4f45;margin-bottom:12px}
+  .ptcard h3{font-size:20px}
+  .ptcard .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .brief{font-size:14px;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+  .brief b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+  .instr{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+  .instr label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer}
+  .state{margin-top:10px;display:none}
+  .state.on{display:block}
+  .meter{height:8px;background:#eee;border-radius:999px;overflow:hidden;margin:6px 0 4px}
+  .meter i{display:block;height:100%;background:var(--accent);width:50%;transition:width .5s}
+  .emo{font-size:13px;font-weight:600}
+  .note{font-size:12px;color:var(--muted);font-style:italic}
+
+  .chat{display:flex;flex-direction:column;min-height:560px}
+  .log{flex:1;overflow:auto;padding:4px 4px 12px;display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:78%;padding:12px 14px;border-radius:14px;font-size:15px;line-height:1.5;position:relative}
+  .msg.student{align-self:flex-end;background:var(--student);border-bottom-right-radius:4px}
+  .msg.patient{align-self:flex-start;background:var(--patient);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .msg.sys{align-self:center;background:transparent;color:var(--muted);font-size:13px;text-align:center}
+  .msg .who{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+  .typing{display:inline-flex;gap:4px}.typing i{width:6px;height:6px;border-radius:50%;background:#aaa;animation:b 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+  @keyframes b{0%,80%,100%{opacity:.3}40%{opacity:1}}
+  .composer{border-top:1px solid var(--line);padding-top:12px;display:flex;gap:10px;align-items:flex-end}
+  .composer textarea{flex:1;min-height:46px;max-height:140px}
+  .mic{width:46px;height:46px;border-radius:50%;padding:0;display:grid;place-items:center;background:var(--accent);flex:none}
+  .mic.live{background:var(--bad);animation:pulse 1.2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(185,28,28,.45)}100%{box-shadow:0 0 0 14px rgba(185,28,28,0)}}
+  .encbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+  .encbar .l{font-size:13px;color:var(--muted)}
+  .interim{font-size:13px;color:var(--muted);min-height:18px;margin-top:6px}
+
+  /* debrief */
+  .score-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .big{font-family:Fraunces,serif;font-size:56px;line-height:1;font-weight:600}
+  .big small{font-size:20px;color:var(--muted)}
+  .spikes{display:grid;gap:10px}
+  .sp{display:grid;grid-template-columns:150px 1fr 36px;gap:12px;align-items:center;font-size:14px}
+  .sp .bar{height:10px;background:#eee;border-radius:999px;overflow:hidden}
+  .sp .bar i{display:block;height:100%;background:var(--accent)}
+  .sp .bar i.mid{background:var(--warn)}.sp .bar i.low{background:var(--bad)}
+  .moment{border-left:3px solid var(--line);padding:10px 14px;margin-bottom:12px}
+  .moment.good{border-color:var(--accent)}.moment.fix{border-color:var(--warn)}
+  .moment q{display:block;font-family:Fraunces,serif;font-size:17px;margin-bottom:6px}
+  .moment .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  .moment p{margin:4px 0 0;font-size:14px}
+  .cost{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .cost .c{flex:1;min-width:150px}
+  .cost .c b{display:block;font-family:Fraunces,serif;font-size:28px}
+  .cost .c span{font-size:12px;color:var(--muted)}
+  .err{background:var(--bad-soft);color:var(--bad);padding:10px 12px;border-radius:10px;font-size:13px;margin-top:10px;display:none}
+  ul.clean{padding-left:18px;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="mark">B</div><div><h1>Bedside</h1><div class="tag">AI standardized patient · breaking bad news</div></div></div>
+    <div id="nav"><button class="ghost" id="btnHome" style="display:none">← Scenarios</button></div>
+  </header>
+
+  <!-- HOME -->
+  <section class="screen active" id="home">
+    <div class="hero">
+      <h2>Practice the conversation no one wants to have. As many times as you need.</h2>
+      <p>Pick a scenario. Talk to the patient out loud. They react like a real person. When you're done, get a SPIKES scorecard that quotes your own words back to you.</p>
+    </div>
+    <div class="grid cols-3" id="scenarios"></div>
+    <div class="card" style="margin-top:20px">
+      <b style="font-size:14px">Anthropic API key</b>
+      <div class="keyrow"><input id="apikey" type="password" placeholder="sk-ant-..." autocomplete="off"><button class="secondary" id="saveKey">Save</button></div>
+      <div class="hint">Stored only in this browser. A full session costs a few cents.</div>
+      <div class="err" id="homeErr"></div>
+    </div>
+  </section>
+
+  <!-- ENCOUNTER -->
+  <section class="screen" id="encounter">
+    <div class="encbar">
+      <div class="l" id="encTitle"></div>
+      <div style="display:flex;gap:8px"><button class="secondary" id="btnRestart">Restart</button><button id="btnEnd">End conversation →</button></div>
+    </div>
+    <div class="enc">
+      <div class="card ptcard">
+        <div class="avatar" id="ptInitial"></div>
+        <h3 id="ptName"></h3>
+        <div class="sub" id="ptSub"></div>
+        <div class="brief"><b>Your role</b><div id="ptRole"></div></div>
+        <div class="brief"><b>What you know</b><div id="ptFacts"></div></div>
+        <div class="instr">
+          <label><input type="checkbox" id="instrToggle"> Instructor view (hidden patient state)</label>
+          <div class="state" id="state">
+            <div class="emo" id="emo">—</div>
+            <div class="meter"><i id="trustBar"></i></div>
+            <div class="note" id="trustNote">Trust</div>
+          </div>
+        </div>
+      </div>
+      <div class="card chat">
+        <div class="log" id="log"></div>
+        <div class="composer">
+          <button class="mic" id="mic" title="Hold to talk">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v4M8 21h8"/></svg>
+          </button>
+          <textarea id="input" placeholder="Speak with the mic, or type what you'd say…" rows="1"></textarea>
+          <button id="send">Say it</button>
+        </div>
+        <div class="interim" id="interim"></div>
+        <div class="err" id="encErr"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEBRIEF -->
+  <section class="screen" id="debrief">
+    <div class="score-head">
+      <div><div class="tag">Debrief · <span id="dbScenario"></span></div><h2 style="font-size:30px" id="dbHeadline">Scoring your conversation…</h2></div>
+      <div class="big" id="dbOverall"></div>
+    </div>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3 style="font-size:18px;margin-bottom:12px">SPIKES breakdown</h3>
+        <div class="spikes" id="spikes"></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:18px;margin-bottom:12px">How the patient experienced it</h3>
+        <p id="dbPatient" style="margin:0;font-size:14px"></p>
+        <div style="margin-top:14px"><b style="font-size:13px">What worked</b><ul class="clean" id="dbStrengths"></ul></div>
+        <div style="margin-top:10px"><b style="font-size:13px">Practice next time</b><p id="dbNext" style="margin:4px 0 0;font-size:14px"></p></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3 style="font-size:18px;margin-bottom:12px">Key moments</h3>
+      <div id="moments"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="cost">
+        <div class="c"><b id="costThis">$0.00</b><span>This session (API cost)</span></div>
+        <div class="c"><b>~$120</b><span>One standardized-patient encounter</span></div>
+        <div class="c"><b id="costReps">—</b><span>Practice reps you'd get for the price of one</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button id="btnAgain">Try the same scenario again</button>
+      <button class="secondary" id="btnOther">Pick another scenario</button>
+    </div>
+    <div class="err" id="dbErr"></div>
+  </section>
+</div>
+
+<script>
+/* ---------------- scenarios ---------------- */
+const SCENARIOS = [
+  {
+    id:'chen', name:'Linda Chen', age:58, pronouns:'she/her', initial:'L', voice:'female',
+    difficulty:'Core', title:'Biopsy results: pancreatic cancer',
+    teaser:'She thinks the mass was probably a cyst. It isn\'t.',
+    role:'You are a third-year medical student on the GI service. The attending has asked you to share the biopsy result and the next steps with Mrs. Chen, then they will join.',
+    facts:'CT showed a 3 cm mass in the head of the pancreas. Biopsy confirms adenocarcinoma. Staging is pending; oncology referral is being placed. She was told two weeks ago it was "probably benign, but let\'s be sure."',
+    persona:`You are Linda Chen, 58, a high-school chemistry teacher. Married to David, two adult kids. You have been having vague abdominal pain and weight loss. Two weeks ago a doctor said the mass on your CT was "probably a cyst, but let's be sure." You came alone today because you expected good news and didn't want to make David take off work. You are polite, a little chatty when nervous, and you like information in order. Deep down you have a quiet fear because your mother died of cancer, but you have not said this out loud to anyone.`,
+    opening:`Oh, hi. Are you the student doctor? The nurse said you'd be in first. So… is it good news? Can I stop worrying about this thing?`
+  },
+  {
+    id:'alvarez', name:'Maria Alvarez', age:31, pronouns:'she/her', initial:'M', voice:'female',
+    difficulty:'Hard', title:'Missed miscarriage at 11 weeks',
+    teaser:'She came in for a routine scan. There is no heartbeat.',
+    role:'You are a student on the OB/GYN rotation. The ultrasound tech stepped out and asked you to speak with Ms. Alvarez while the resident finishes with another patient.',
+    facts:'Ultrasound shows a fetal pole measuring 8 weeks 4 days with no cardiac activity. Dates were confirmed at 7 weeks with a heartbeat. This is a missed miscarriage. Options will be expectant management, misoprostol, or D&C, to be discussed with the resident.',
+    persona:`You are Maria Alvarez, 31, a dental hygienist. This is your first pregnancy after a year of trying. You are 11 weeks along and came alone because your partner Jon had a work thing; you planned to FaceTime him the ultrasound picture. You noticed the tech went quiet and left the room, and you've been sitting here for ten minutes telling yourself it's nothing. You are warm, hopeful, and you ask direct questions. When you understand what has happened you will cry, and then you will ask whether you did something wrong.`,
+    opening:`Hi — sorry, is everything okay? The tech kind of just… left. She was really quiet. I'm probably overthinking it. Is the baby okay?`
+  },
+  {
+    id:'hale', name:'Robert Hale', age:72, pronouns:'he/him', initial:'R', voice:'male',
+    difficulty:'Hard', title:'Dementia diagnosis and losing the keys',
+    teaser:'A proud man who has driven for 50 years. He can\'t anymore.',
+    role:'You are a student in the neurology clinic. You need to tell Mr. Hale that his testing is consistent with Alzheimer\'s disease, and that he should stop driving. His wife Joan is in the waiting room and he asked that she not come in.',
+    facts:'MoCA 19/30, MRI with hippocampal atrophy, neuropsych testing consistent with mild-stage Alzheimer\'s dementia. Two minor fender-benders in the last year. Joan has privately told the clinic she is scared to ride with him.',
+    persona:`You are Robert Hale, 72, a retired long-haul truck driver. You drove professionally for 40 years without a serious accident and you are proud of it. You came in because Joan pushed you to, and you think everyone is making a big deal out of "normal forgetting." You are gruff, dry-humored, and you deflect with jokes when something scares you. Driving means independence to you; losing it feels like being told you're done. If someone treats you like a child or rushes you, you get angry and shut down. If someone is straight with you and respects you, you will eventually admit you've been scared too.`,
+    opening:`Alright, doc. Let's get this over with. Joan's out there convinced I'm losing my marbles. So what'd the tests say — am I all there or not?`
+  }
+];
+
+const EMOTIONS = ['calm','hopeful','anxious','guarded','confused','shocked','tearful','angry','withdrawn','relieved','grateful'];
+
+/* ---------------- state ---------------- */
+const S = { scenario:null, messages:[], usage:{in:0,out:0}, trust:55, emotion:'anxious', recognizing:false, busy:false };
+const $ = id => document.getElementById(id);
+const MODEL = 'claude-opus-5-5';
+const PRICE = { in: 4/1e6, out: 20/1e6 }; // $ per token
+
+/* ---------------- api ---------------- */
+async function claude({system, messages, maxTokens=1024, effort='low'}) {
+  const key = localStorage.getItem('bedside_key') || '';
+  if (!key) throw new Error('Add your Anthropic API key on the home screen first.');
+  const body = { model: MODEL, max_tokens: maxTokens, system, messages, output_config:{effort}, fallbacks:'default' };
+  const headers = {
+    'content-type':'application/json',
+    'x-api-key': key,
+    'anthropic-version':'2023-06-01',
+    'anthropic-dangerous-direct-browser-access':'true',
+    'anthropic-beta':'server-side-fallback-2026-07-01'
+  };
+  let res = await fetch('https://api.anthropic.com/v1/messages', {method:'POST', headers, body: JSON.stringify(body)});
+  if (res.status === 400) {
+    // retry without the fallback beta in case this org/key doesn't accept it
+    delete body.fallbacks; delete headers['anthropic-beta'];
+    res = await fetch('https://api.anthropic.com/v1/messages', {method:'POST', headers, body: JSON.stringify(body)});
+  }
+  if (!res.ok) {
+    let msg = res.status + ' ' + res.statusText;
+    try { const j = await res.json(); msg = j.error?.message || msg; } catch {}
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  if (data.usage) { S.usage.in += data.usage.input_tokens||0; S.usage.out += data.usage.output_tokens||0; }
+  if (data.stop_reason === 'refusal') throw new Error('The model declined this request. Try rephrasing.');
+  return data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+}
+function parseJSON(text) {
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('No JSON in response');
+  return JSON.parse(m[0]);
+}
+
+/* ---------------- prompts ---------------- */
+function patientSystem(sc) {
+  return `You are role-playing a patient in a medical communication training simulator. Stay fully in character as the patient. Never break character, never give feedback, never mention being an AI or a simulation.
+
+CHARACTER
+${sc.persona}
+
+MEDICAL SITUATION (the patient does NOT know this yet unless the student tells them)
+${sc.facts}
+
+HOW TO BEHAVE
+- You have a hidden emotional state. Track it honestly. It should move in response to what the student does:
+  * Rises (trust up): warning shots before bad news, checking what you already understand, asking what you want to know, plain language, pausing and letting silence sit, naming your emotion, sitting with you rather than fixing, a clear next step, asking who you want with you.
+  * Falls (trust down): jargon, rushing, dumping information, false reassurance, euphemisms that hide the truth, talking over your emotion, answering a question you didn't ask, leaving you without a plan.
+- React like a real person, not a textbook. Interrupt with questions. Go quiet. Mishear things. Repeat something back wrong if the student was vague. If the student uses a euphemism ("the results weren't what we hoped") do NOT assume you understood; ask what they mean or misunderstand it optimistically.
+- Speak in short, natural, spoken sentences. 1 to 4 sentences per turn. No stage directions in the speech itself.
+- If the student clearly ends the visit, respond with a brief natural closing.
+
+OUTPUT FORMAT — respond with ONLY a JSON object, no prose before or after:
+{"say": "<what you say out loud>", "emotion": "<one of: ${EMOTIONS.join(', ')}>", "trust": <integer 0-100>, "inner": "<one short sentence of what you are privately thinking, for the instructor>"}`;
+}
+
+function graderSystem(sc) {
+  return `You are a senior palliative-care physician and communication-skills faculty member grading a medical student's practice encounter in which they had to break bad news. Be specific, direct, warm, and useful. Quote the student's exact words when giving feedback. Grade against the SPIKES protocol.
+
+SCENARIO: ${sc.title}. ${sc.role}
+FACTS THE STUDENT HAD: ${sc.facts}
+PATIENT: ${sc.persona}
+
+Score each SPIKES step 0-5 (5 = expert):
+- Setting: privacy, sitting down, who should be present, no interruptions, enough time.
+- Perception: found out what the patient already knows or suspects before telling.
+- Invitation: asked how much the patient wants to know and how.
+- Knowledge: warning shot, plain language, no jargon, chunked information, checked understanding, no false reassurance, no euphemism that obscured the truth.
+- Empathy: noticed and named emotion, allowed silence, responded to feeling before fact, did not abandon the patient to their reaction.
+- Strategy: clear next steps, what happens now, support, who to contact, patient left with a plan.
+
+OUTPUT FORMAT — respond with ONLY a JSON object:
+{
+ "headline": "<one honest sentence summarizing the encounter, under 15 words>",
+ "overall": <integer 0-100>,
+ "spikes": {"Setting":n,"Perception":n,"Invitation":n,"Knowledge":n,"Empathy":n,"Strategy":n},
+ "patient_experience": "<2-3 sentences, written from the patient's point of view, about how it felt to be on the receiving end>",
+ "strengths": ["<specific thing done well, quoting if possible>", "..."],
+ "moments": [
+   {"quote": "<exact words the student said>", "kind": "good" | "fix", "what_patient_heard": "<what the patient actually took from it>", "better": "<a concrete alternative line the student could have said, or why it worked if good>"}
+ ],
+ "next": "<the single most valuable thing to practice next time, one or two sentences>"
+}
+Include 3 to 5 moments. At least one must be "fix". If the student did something genuinely well, include it as "good".`;
+}
+
+/* ---------------- speech ---------------- */
+let voices = [];
+function loadVoices(){ voices = speechSynthesis.getVoices(); }
+loadVoices(); if (typeof speechSynthesis!=='undefined') speechSynthesis.onvoiceschanged = loadVoices;
+function pickVoice(gender){
+  const pref = gender==='female' ? ['Samantha','Karen','Moira','Google UK English Female','Microsoft Aria','Victoria','Zira'] : ['Daniel','Alex','Fred','Google UK English Male','Microsoft Guy','Tom','David'];
+  for (const p of pref){ const v = voices.find(v=>v.name.includes(p)); if (v) return v; }
+  return voices.find(v=>v.lang.startsWith('en')) || voices[0];
+}
+function speak(text, emotion){
+  if (typeof speechSynthesis==='undefined') return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = pickVoice(S.scenario.voice);
+  const slow = ['tearful','withdrawn','shocked'].includes(emotion);
+  u.rate = slow ? 0.85 : 0.95;
+  u.pitch = S.scenario.voice==='female' ? 1.05 : 0.9;
+  speechSynthesis.speak(u);
+}
+
+let rec = null;
+function setupRecognition(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { $('mic').style.display='none'; $('interim').textContent='Voice input not supported in this browser — type instead.'; return; }
+  rec = new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=true;
+  let finalText='';
+  rec.onstart=()=>{ S.recognizing=true; $('mic').classList.add('live'); finalText=''; $('interim').textContent='Listening…'; speechSynthesis.cancel(); };
+  rec.onresult=e=>{
+    let interim='';
+    for (let i=e.resultIndex;i<e.results.length;i++){ const t=e.results[i][0].transcript; if (e.results[i].isFinal) finalText+=t+' '; else interim+=t; }
+    $('interim').textContent = (finalText+interim).trim() || 'Listening…';
+  };
+  rec.onerror=e=>{ $('interim').textContent='Mic error: '+e.error; stopRec(); };
+  rec.onend=()=>{ S.recognizing=false; $('mic').classList.remove('live'); const t=finalText.trim(); if (t){ $('input').value=t; $('interim').textContent=''; sendStudent(); } else $('interim').textContent=''; };
+}
+function stopRec(){ try{ rec && rec.stop(); }catch{} }
+function toggleRec(){ if (!rec) return; if (S.recognizing) stopRec(); else { try{ rec.start(); }catch(e){} } }
+
+/* ---------------- ui: home ---------------- */
+function renderScenarios(){
+  $('scenarios').innerHTML = SCENARIOS.map(s=>`
+    <div class="card scenario" data-id="${s.id}">
+      <div class="diff">${s.difficulty}</div>
+      <h3>${s.title}</h3>
+      <p>${s.name}, ${s.age}. ${s.teaser}</p>
+    </div>`).join('');
+  document.querySelectorAll('.scenario').forEach(el=>el.onclick=()=>startScenario(el.dataset.id));
+  $('apikey').value = localStorage.getItem('bedside_key') ? '••••••••••••••••' : '';
+}
+$('saveKey').onclick=()=>{ const v=$('apikey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_key', v); $('apikey').value='••••••••••••••••'; } };
+
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); $('btnHome').style.display = id==='home'?'none':'inline-block'; }
+$('btnHome').onclick=()=>{ speechSynthesis.cancel(); stopRec(); show('home'); };
+
+/* ---------------- ui: encounter ---------------- */
+function addMsg(role, text, who){
+  const d=document.createElement('div'); d.className='msg '+role;
+  d.innerHTML = (who?`<div class="who">${who}</div>`:'') + escapeHtml(text);
+  $('log').appendChild(d); $('log').scrollTop=$('log').scrollHeight; return d;
+}
+function escapeHtml(s){ return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function setState(emotion, trust, inner){
+  S.emotion=emotion; S.trust=trust;
+  $('emo').textContent = emotion.charAt(0).toUpperCase()+emotion.slice(1);
+  $('trustBar').style.width = trust+'%';
+  $('trustBar').style.background = trust<35?'var(--bad)':trust<60?'var(--warn)':'var(--accent)';
+  $('trustNote').textContent = 'Trust '+trust+'/100' + (inner?' · "'+inner+'"':'');
+}
+
+function startScenario(id){
+  const sc = SCENARIOS.find(s=>s.id===id); S.scenario=sc; S.messages=[]; S.usage={in:0,out:0};
+  $('encTitle').textContent = sc.title;
+  $('ptInitial').textContent = sc.initial; $('ptName').textContent = sc.name;
+  $('ptSub').textContent = `${sc.age} · ${sc.pronouns}`;
+  $('ptRole').textContent = sc.role; $('ptFacts').textContent = sc.facts;
+  $('log').innerHTML=''; $('input').value=''; $('encErr').style.display='none';
+  addMsg('sys', 'You knock and enter the room.');
+  const first = { say: sc.opening, emotion:'anxious', trust:55, inner:'Please let this be nothing.' };
+  S.messages.push({role:'assistant', content: JSON.stringify(first)});
+  addMsg('patient', first.say, sc.name); setState(first.emotion, first.trust, first.inner);
+  show('encounter');
+  setTimeout(()=>speak(first.say, first.emotion), 300);
+}
+
+async function sendStudent(){
+  const text = $('input').value.trim(); if (!text || S.busy) return;
+  $('input').value=''; $('encErr').style.display='none';
+  addMsg('student', text, 'You'); S.messages.push({role:'user', content:text});
+  S.busy=true; $('send').disabled=true;
+  const t = addMsg('patient', '', S.scenario.name); t.innerHTML += '<span class="typing"><i></i><i></i><i></i></span>';
+  try {
+    const raw = await claude({system: patientSystem(S.scenario), messages: S.messages, maxTokens: 600, effort:'low'});
+    let p; try { p = parseJSON(raw); } catch { p = {say: raw, emotion:S.emotion, trust:S.trust, inner:''}; }
+    S.messages.push({role:'assistant', content: JSON.stringify(p)});
+    t.innerHTML = `<div class="who">${S.scenario.name}</div>` + escapeHtml(p.say);
+    setState(p.emotion||S.emotion, Math.max(0,Math.min(100,+p.trust||S.trust)), p.inner||'');
+    speak(p.say, p.emotion);
+  } catch(e) {
+    t.remove(); S.messages.pop(); $('encErr').textContent = e.message; $('encErr').style.display='block';
+  } finally { S.busy=false; $('send').disabled=false; $('log').scrollTop=$('log').scrollHeight; }
+}
+$('send').onclick=sendStudent;
+$('input').addEventListener('keydown', e=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendStudent(); } });
+$('mic').onclick=toggleRec;
+$('instrToggle').onchange=e=>$('state').classList.toggle('on', e.target.checked);
+$('btnRestart').onclick=()=>startScenario(S.scenario.id);
+$('btnEnd').onclick=endEncounter;
+
+/* ---------------- debrief ---------------- */
+function transcriptText(){
+  return S.messages.map(m=>{
+    if (m.role==='user') return 'STUDENT: '+m.content;
+    let say=m.content; try{ say=JSON.parse(m.content).say; }catch{}
+    return 'PATIENT: '+say;
+  }).join('\n');
+}
+async function endEncounter(){
+  if (S.messages.filter(m=>m.role==='user').length===0) { $('encErr').textContent='Say at least one thing to the patient first.'; $('encErr').style.display='block'; return; }
+  speechSynthesis.cancel(); stopRec();
+  show('debrief');
+  $('dbScenario').textContent=S.scenario.title; $('dbHeadline').textContent='Scoring your conversation…'; $('dbOverall').textContent='';
+  $('spikes').innerHTML=''; $('moments').innerHTML=''; $('dbStrengths').innerHTML=''; $('dbPatient').textContent=''; $('dbNext').textContent=''; $('dbErr').style.display='none';
+  try {
+    const raw = await claude({system: graderSystem(S.scenario), messages:[{role:'user', content:'TRANSCRIPT:\n\n'+transcriptText()+'\n\nGrade this encounter.'}], maxTokens: 3000, effort:'medium'});
+    renderDebrief(parseJSON(raw));
+  } catch(e) { $('dbHeadline').textContent='Could not score this session.'; $('dbErr').textContent=e.message; $('dbErr').style.display='block'; }
+}
+function renderDebrief(d){
+  $('dbHeadline').textContent = d.headline || 'Debrief';
+  $('dbOverall').innerHTML = `${d.overall}<small>/100</small>`;
+  const order=['Setting','Perception','Invitation','Knowledge','Empathy','Strategy'];
+  $('spikes').innerHTML = order.map(k=>{ const v=+((d.spikes||{})[k]||0); const cls=v<=2?'low':v<=3?'mid':''; return `<div class="sp"><span>${k}</span><div class="bar"><i class="${cls}" style="width:${v/5*100}%"></i></div><b>${v}/5</b></div>`; }).join('');
+  $('dbPatient').textContent = d.patient_experience||'';
+  $('dbStrengths').innerHTML = (d.strengths||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join('');
+  $('dbNext').textContent = d.next||'';
+  $('moments').innerHTML = (d.moments||[]).map(m=>`
+    <div class="moment ${m.kind==='good'?'good':'fix'}">
+      <q>“${escapeHtml(m.quote||'')}”</q>
+      <div class="lbl">What the patient heard</div><p>${escapeHtml(m.what_patient_heard||'')}</p>
+      <div class="lbl" style="margin-top:8px">${m.kind==='good'?'Why it worked':'Try instead'}</div><p>${escapeHtml(m.better||'')}</p>
+    </div>`).join('');
+  const cost = S.usage.in*PRICE.in + S.usage.out*PRICE.out;
+  $('costThis').textContent = '$'+cost.toFixed(3);
+  $('costReps').textContent = cost>0 ? Math.round(120/cost).toLocaleString()+'×' : '—';
+}
+$('btnAgain').onclick=()=>startScenario(S.scenario.id);
+$('btnOther').onclick=()=>show('home');
+
+/* ---------------- init ---------------- */
+renderScenarios(); setupRecognition();
+</script>
+</body>
+</html>
