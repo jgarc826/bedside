@@ -25,7 +25,7 @@
   input,textarea{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);width:100%}
   textarea{resize:none}
   .wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
-  header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+  header.top{display:flex;align-items:center;gap:12px;margin-bottom:28px}
   .brand{display:flex;align-items:center;gap:10px}
   .brand .mark{width:30px;height:30px;border-radius:50%;background:var(--sky);display:grid;place-items:center;color:var(--ink);font-family:var(--slab);font-weight:700}
   .brand h1{font-size:22px;font-weight:400}
@@ -34,6 +34,39 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
   .grid{display:grid;gap:16px}
   @media(min-width:760px){.grid.cols-3{grid-template-columns:repeat(3,1fr)} .grid.cols-2{grid-template-columns:1fr 1fr}}
+  .nav{display:flex;gap:4px;margin-left:auto;margin-right:16px}
+  .nav a{font-size:14px;padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500}
+  .nav a.on{color:var(--ink);background:#fff;border:1px solid var(--line)}
+  .nav a.soon{opacity:.5;cursor:default}
+  .who-chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px}
+  .who-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--sky)}
+  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .filters a{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
+  .filters a.on{color:var(--ink);border-color:var(--ink)}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+  .done{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--sky-soft);padding:3px 8px;border-radius:999px;float:right}
+  .trust-row{display:grid;gap:14px;margin-top:28px;font-size:14px;color:var(--muted)}
+  @media(min-width:760px){.trust-row{grid-template-columns:1fr 1fr 1fr}}
+  .trust-row b{color:var(--ink);display:block;margin-bottom:2px}
+  @media(min-width:760px){.grid.cols-4{grid-template-columns:repeat(4,1fr)}}
+  .tile{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .tile b{display:block;font-family:var(--slab);font-size:34px;font-weight:300;line-height:1.1}
+  .tile span{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .sess{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .sess:last-child{border-bottom:0}
+  .sess .sc{font-family:var(--slab);font-size:22px;font-weight:300}
+  .sess .d{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .modal{position:fixed;inset:0;background:rgba(42,39,36,.35);display:none;place-items:center;z-index:50;padding:16px}
+  .modal.on{display:grid}
+  .modal-card{background:#fff;border-radius:14px;padding:22px;width:min(520px,100%);box-shadow:0 20px 60px rgba(0,0,0,.2)}
+  .comp{display:grid;gap:8px;font-size:14px}
+  @media(min-width:760px){.comp{grid-template-columns:1fr 1fr}}
+  .comp div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .comp b{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+  .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60}
+  .toast.on{opacity:1}
+  @media print{.nav,.who-chip,.foot,button{display:none!important} body{border:0}}
   .scenario{cursor:pointer;transition:transform .12s,border-color .12s}
   .scenario:hover{transform:translateY(-2px);border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-soft)}
   .scenario .diff{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:inline-block;margin-bottom:12px}
@@ -133,27 +166,56 @@
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="brand"><div class="mark">B</div><div><h1>Bedside</h1><div class="tag">AI standardized patient · DT Hackathon 2026</div></div></div>
-    <div id="nav"><button class="ghost" id="btnHome" style="display:none">← Scenarios</button></div>
+    <div class="brand"><div class="mark">B</div><div><h1>Bedside</h1><div class="tag">Communication skills simulation</div></div></div>
+    <nav class="nav">
+      <a id="navHome" class="on">Scenarios</a>
+      <a id="navProgress">My progress</a>
+      <a class="soon" title="Coming soon">Faculty</a>
+      <a id="navSettings">Settings</a>
+    </nav>
+    <div class="who-chip"><span class="dot"></span>MS3 · Clinical Skills</div>
   </header>
 
   <!-- HOME -->
   <section class="screen active" id="home">
     <div class="hero">
+      <div class="tag" style="margin-bottom:10px">Scenario library</div>
       <h2>Practice the <b>conversation no one wants to have.</b> As many times as you need.</h2>
-      <p>Pick a scenario. Talk to the patient out loud. They react like a real person. When you're done, get a SPIKES scorecard that quotes your own words back to you.</p>
+      <p>Simulated patients who react like people. A SPIKES debrief that quotes your own words. Aligned to the AAMC Core EPAs and the ACGME Interpersonal and Communication Skills competency.</p>
     </div>
+    <div class="filters" id="filters"></div>
     <div class="grid cols-3" id="scenarios"></div>
-    <div class="card" style="margin-top:20px">
-      <b style="font-size:14px">Anthropic API key</b>
-      <div class="keyrow"><input id="apikey" type="password" placeholder="sk-ant-..." autocomplete="off"><button class="secondary" id="saveKey">Save</button></div>
-      <div class="hint">Stored only in this browser. A full session costs a few cents.</div>
-      <b style="font-size:14px;display:block;margin-top:16px">ElevenLabs API key <span style="font-weight:400;color:var(--muted)">(optional, for a natural voice)</span></b>
-      <div class="keyrow"><input id="elkey" type="password" placeholder="xi-..." autocomplete="off"><button class="secondary" id="saveElKey">Save</button></div>
-      <div class="hint" id="elStatus">Without it the patient uses the browser's built-in voice.</div>
-      <div class="err" id="homeErr"></div>
+    <div class="trust-row">
+      <div><b>No real patient data.</b> Every patient is simulated. Nothing you say leaves your browser except the conversation text sent to the AI model.</div>
+      <div><b>Evidence-based.</b> Scoring follows the SPIKES protocol (Baile et al., 2000), the framework taught in most US medical schools.</div>
+      <div><b>Unlimited repetitions.</b> A session costs a few cents in model usage, compared with hundreds of dollars for a standardized-patient encounter.</div>
     </div>
   </section>
+
+  <!-- PROGRESS -->
+  <section class="screen" id="progress">
+    <div class="hero"><div class="tag" style="margin-bottom:10px">My progress</div><h2>Your <b>communication</b> record.</h2></div>
+    <div class="grid cols-4" id="statTiles"></div>
+    <div class="grid cols-2" style="margin-top:16px">
+      <div class="card"><h3 style="font-size:18px;margin-bottom:12px">SPIKES averages</h3><div class="spikes" id="progSpikes"></div></div>
+      <div class="card"><h3 style="font-size:18px;margin-bottom:12px">Sessions</h3><div id="sessionList"></div></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <div class="modal" id="settings">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h3 style="font-size:20px">Settings</h3><button class="ghost" id="closeSettings">✕</button></div>
+      <b style="font-size:14px">Anthropic API key</b>
+      <div class="keyrow"><input id="apikey" type="password" placeholder="sk-ant-..." autocomplete="off"><button class="secondary" id="saveKey">Save</button></div>
+      <div class="hint">Powers the simulated patient and the debrief. Stored only in this browser.</div>
+      <b style="font-size:14px;display:block;margin-top:16px">ElevenLabs API key <span style="font-weight:400;color:var(--muted)">(optional, natural voice)</span></b>
+      <div class="keyrow"><input id="elkey" type="password" placeholder="sk_..." autocomplete="off"><button class="secondary" id="saveElKey">Save</button></div>
+      <div class="hint" id="elStatus">Without it the patient uses the browser's built-in voice.</div>
+      <div class="hint" style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px">Bedside v0.9 · Simulated patients only. Not for clinical use.</div>
+      <div class="err" id="homeErr"></div>
+    </div>
+  </div>
 
   <!-- ENCOUNTER -->
   <section class="screen" id="encounter">
@@ -238,9 +300,13 @@
       <div id="moments"></div>
     </div>
     <div class="card" style="margin-top:16px">
+      <h3 style="font-size:18px;margin-bottom:10px">Competency mapping</h3>
+      <div class="comp" id="comp"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
       <div class="cost">
         <div class="c"><b id="costThis">$0.00</b><span>This session (API cost)</span></div>
-        <div class="c"><b>~$120</b><span>One standardized-patient encounter</span></div>
+        <div class="c"><b>$665</b><span>One standardized-patient simulation (Sudan et al.)</span></div>
         <div class="c"><b id="costReps">—</b><span>Practice reps you'd get for the price of one</span></div>
       </div>
     </div>
@@ -248,12 +314,18 @@
       <h3 style="font-size:18px;margin-bottom:12px">Transcript</h3>
       <div class="log" id="transcript"></div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:20px">
+    <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
       <button id="btnAgain">Try the same scenario again</button>
       <button class="secondary" id="btnOther">Pick another scenario</button>
+      <button class="secondary" id="btnPrint">Download report</button>
+      <button class="secondary" id="btnFaculty">Request faculty review</button>
     </div>
     <div class="err" id="dbErr"></div>
   </section>
+  <footer class="foot">
+    <div>© 2026 Bedside · Simulated patients only. Not a medical device. No real patient information is collected or stored.</div>
+    <div class="tag">SPIKES · AAMC Core EPA 1 · ACGME ICS1</div>
+  </footer>
 </div>
 
 <script>
@@ -291,6 +363,41 @@ const SCENARIOS = [
   }
 ];
 
+SCENARIOS[0].meta={specialty:'Oncology / GI', focus:'Perception · Knowledge', mins:8};
+SCENARIOS[1].meta={specialty:'OB/GYN', focus:'Empathy · Strategy', mins:8};
+SCENARIOS[2].meta={specialty:'Neurology', focus:'Invitation · Empathy', mins:10};
+SCENARIOS.push(
+  {
+    id:'reyes', name:'Daniela Reyes', age:34, pronouns:'she/her', voice:'female',
+    look:{face:3, hair:53, nose:2}, meta:{specialty:'Pediatrics', focus:'Knowledge · Strategy', mins:8},
+    difficulty:'Core', title:'New type 1 diabetes in a six-year-old',
+    teaser:'A mother in the ED. Her daughter\'s glucose was 480.',
+    role:'You are a student in the pediatric emergency department. Sofia, 6, has been diagnosed with new-onset type 1 diabetes and is being admitted. You need to explain the diagnosis to her mother, who is waiting outside the room.',
+    facts:'Glucose 480, mild DKA, admitted to the pediatric floor for insulin initiation and diabetes education. Sofia is stable. This is lifelong and will require daily insulin, but children with type 1 diabetes live full lives.',
+    persona:`You are Daniela Reyes, 34, a mother of two who works as a paralegal. Sofia has been thirsty and tired for two weeks and you thought it was a virus. You feel guilty for not bringing her sooner. You are practical and ask a lot of questions when you are scared, and you will push for specifics: is it your fault, did the sugar she eats cause this, will she need shots forever, can she still play soccer. If the student is vague you get more anxious. If they are clear and kind you steady quickly.`,
+    opening:`Is she okay? Nobody's telling me anything. The nurse said her sugar was really high — what does that mean?`
+  },
+  {
+    id:'okafor', name:'Marcus Okafor', age:24, pronouns:'he/him', voice:'male',
+    look:{face:7, hair:36, nose:4}, meta:{specialty:'Internal Medicine', focus:'Setting · Knowledge', mins:8},
+    difficulty:'Hard', title:'A positive HIV test',
+    teaser:'He came in for a routine screen before a new job.',
+    role:'You are a student in a primary care clinic. Mr. Okafor had routine labs last week. His fourth-generation HIV test and confirmatory assay are both positive. You need to tell him the result.',
+    facts:'HIV-1 positive, confirmed. CD4 and viral load are pending. With modern antiretroviral therapy, life expectancy is near normal and undetectable viral load means the virus cannot be transmitted sexually. Same-day treatment start is available.',
+    persona:`You are Marcus Okafor, 24, a software support specialist starting a new job. You came in for a physical and expected nothing. You are composed on the surface, polite, and you joke a little when nervous. When you understand the result you go quiet, then ask whether you are going to die, who you have to tell, and whether your girlfriend will find out. If the student is clinical and distant you shut down; if they are direct and stay with you, you start to ask good questions.`,
+    opening:`Hey. So the front desk said the doctor wanted to go over my labs in person. That's not usually a good sign, right? Everything come back okay?`
+  },
+  {
+    id:'brennan', name:'Patricia Brennan', age:66, pronouns:'she/her', voice:'female',
+    look:{face:12, hair:55, nose:0, glasses:4}, meta:{specialty:'Critical Care', focus:'Empathy · Strategy', mins:12},
+    difficulty:'Hard', title:'Family meeting after a massive stroke',
+    teaser:'Her husband is on a ventilator. The scan is devastating.',
+    role:'You are a student on the neuro ICU team. Mr. Brennan, 68, had a large hemorrhagic stroke yesterday. His wife has been waiting for an update. The attending has asked you to begin the conversation about his prognosis before joining.',
+    facts:'Large right hemispheric intracerebral hemorrhage with midline shift. Intubated, not following commands, not improving. Neurosurgery does not recommend surgery. Meaningful neurological recovery is very unlikely. The team wants to understand what Mr. Brennan would have wanted.',
+    persona:`You are Patricia Brennan, 66, a retired school librarian married for 44 years. You have not slept. You are holding onto the fact that "he squeezed my hand" this morning. You are polite but you interrupt with hope: he is strong, he beat pneumonia last year, people wake up from these things. If the student uses phrases like "not doing well" you will interpret them optimistically. If they are gentle and honest and ask what Tom would have wanted, you eventually say that he never wanted to be kept on machines.`,
+    opening:`Oh, you're from Tom's team. Is there news? He squeezed my hand this morning, I felt it. That's a good sign, isn't it?`
+  }
+);
 const EMOTIONS = ['calm','hopeful','anxious','guarded','confused','shocked','sad','angry','numb','relieved'];
 
 /* ---------------- state ---------------- */
@@ -303,7 +410,7 @@ const PRICE = { in: 4/1e6, out: 20/1e6 };
 /* ---------------- api ---------------- */
 async function claude({system, messages, maxTokens=1024, effort='low'}) {
   const key = localStorage.getItem('bedside_key') || '';
-  if (!key) throw new Error('Add your Anthropic API key on the home screen first.');
+  if (!key) { $('settings').classList.add('on'); throw new Error('Add your Anthropic API key in Settings first.'); }
   const body = { model: MODEL, max_tokens: maxTokens, system, messages, output_config:{effort}, fallbacks:'default' };
   const headers = {
     'content-type':'application/json',
@@ -638,21 +745,43 @@ function stopRec(){ try{ rec && rec.stop(); }catch{} }
 function toggleRec(){ if (!rec) return; if (S.recognizing) stopRec(); else { try{ rec.start(); }catch(e){} } }
 
 /* ---------------- ui: home ---------------- */
+let FILTER='All';
+function sessions(){ try{ return JSON.parse(localStorage.getItem('bedside_sessions')||'[]'); }catch{ return []; } }
 function renderScenarios(){
-  $('scenarios').innerHTML = SCENARIOS.map(s=>`
+  const specs=['All',...new Set(SCENARIOS.map(s=>s.meta.specialty))];
+  $('filters').innerHTML=specs.map(x=>`<a class="${x===FILTER?'on':''}" data-f="${x}">${x}</a>`).join('');
+  document.querySelectorAll('#filters a').forEach(a=>a.onclick=()=>{FILTER=a.dataset.f; renderScenarios();});
+  const done={}; sessions().forEach(x=>{ done[x.id]=Math.max(done[x.id]||0,x.overall); });
+  $('scenarios').innerHTML = SCENARIOS.filter(s=>FILTER==='All'||s.meta.specialty===FILTER).map(s=>`
     <div class="card scenario" data-id="${s.id}">
+      ${done[s.id]?`<span class="done">Best ${done[s.id]}</span>`:''}
       <div class="diff">${s.difficulty}</div>
       <h3>${s.title}</h3>
       <p>${s.name}, ${s.age}. ${s.teaser}</p>
+      <div class="meta"><span>${s.meta.specialty}</span><span>~${s.meta.mins} min</span><span>${s.meta.focus}</span></div>
     </div>`).join('');
   document.querySelectorAll('.scenario').forEach(el=>el.onclick=()=>startScenario(el.dataset.id));
   $('apikey').value = localStorage.getItem('bedside_key') ? '••••••••••••••••' : '';
   $('elkey').value = localStorage.getItem('bedside_elkey') ? '••••••••••••••••' : '';
 }
+function renderProgress(){
+  const ss=sessions(); const order=['Setting','Perception','Invitation','Knowledge','Empathy','Strategy'];
+  const avg=ss.length?Math.round(ss.reduce((a,x)=>a+x.overall,0)/ss.length):0;
+  const sp={}; order.forEach(k=>sp[k]=ss.length?ss.reduce((a,x)=>a+(x.spikes[k]||0),0)/ss.length:0);
+  const best=ss.length?order.reduce((a,b)=>sp[a]>=sp[b]?a:b):'—'; const weak=ss.length?order.reduce((a,b)=>sp[a]<=sp[b]?a:b):'—';
+  $('statTiles').innerHTML=`<div class="tile"><b>${ss.length}</b><span>Sessions completed</span></div><div class="tile"><b>${ss.length?avg:'—'}</b><span>Average score</span></div><div class="tile"><b style="font-size:22px;padding-top:8px">${best}</b><span>Strongest step</span></div><div class="tile"><b style="font-size:22px;padding-top:8px">${weak}</b><span>Practice next</span></div>`;
+  $('progSpikes').innerHTML=order.map(k=>{const v=sp[k];const cls=v<=2?'low':v<=3?'mid':'';return `<div class="sp"><span>${k}</span><div class="bar"><i class="${cls}" style="width:${v/5*100}%"></i></div><b>${v?v.toFixed(1):'—'}</b></div>`;}).join('');
+  $('sessionList').innerHTML= ss.length ? ss.slice().reverse().map(x=>`<div class="sess"><div><div>${escapeHtml(x.title)}</div><div class="d">${new Date(x.at).toLocaleString()}${x.faculty?' · Review requested':''}</div></div><div class="sc">${x.overall}</div></div>`).join('') : '<div class="hint">No sessions yet. Complete a scenario to start your record.</div>';
+}
+function toast(msg){ let t=document.querySelector('.toast'); if(!t){ t=document.createElement('div'); t.className='toast'; document.body.appendChild(t);} t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2200); }
+$('navHome').onclick=()=>{ show('home'); renderScenarios(); };
+$('navProgress').onclick=()=>{ renderProgress(); show('progress'); };
+$('navSettings').onclick=()=>$('settings').classList.add('on');
+$('closeSettings').onclick=()=>$('settings').classList.remove('on');
+$('settings').onclick=e=>{ if(e.target===$('settings')) $('settings').classList.remove('on'); };
 $('saveKey').onclick=()=>{ const v=$('apikey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_key', v); $('apikey').value='••••••••••••••••'; } };
 $('saveElKey').onclick=()=>{ const v=$('elkey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_elkey', v); $('elkey').value='••••••••••••••••'; EL.voices=null; loadElVoices(); } };
-function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); $('btnHome').style.display = id==='home'?'none':'inline-block'; }
-$('btnHome').onclick=()=>{ stopSpeech(); stopRec(); show('home'); };
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); $('navHome').classList.toggle('on', id==='home'||id==='encounter'||id==='debrief'); $('navProgress').classList.toggle('on', id==='progress'); if (id!=='encounter'){ stopSpeech(); stopRec(); } window.scrollTo(0,0); }
 
 /* ---------------- ui: encounter ---------------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -729,6 +858,7 @@ async function endEncounter(){
   stopSpeech(); stopRec(); clearTimeout(blinkTimer); clearTimeout(driftTimer);
   show('debrief');
   $('dbScenario').textContent=S.scenario.title; $('dbHeadline').textContent='Scoring your conversation…'; $('dbOverall').textContent='';
+  $('btnFaculty').textContent='Request faculty review'; $('btnFaculty').disabled=false;
   $('spikes').innerHTML=''; $('moments').innerHTML=''; $('dbStrengths').innerHTML=''; $('dbPatient').textContent=''; $('dbNext').textContent=''; $('dbErr').style.display='none';
   $('transcript').innerHTML = transcriptPairs().map(p=>`<div class="msg ${p.cls}"><div class="who">${escapeHtml(p.who)}</div>${escapeHtml(p.text)}</div>`).join('');
   try {
@@ -750,12 +880,23 @@ function renderDebrief(d){
       <div class="lbl">What the patient heard</div><p>${escapeHtml(m.what_patient_heard||'')}</p>
       <div class="lbl" style="margin-top:8px">${m.kind==='good'?'Why it worked':'Try instead'}</div><p>${escapeHtml(m.better||'')}</p>
     </div>`).join('');
+  const comp=[
+    ['AAMC Core EPA 1','Gather a history and perform a physical exam — eliciting the patient\'s perspective', (d.spikes||{}).Perception],
+    ['ACGME ICS1','Communicate effectively with patients and families across a broad range of socioeconomic and cultural backgrounds', (d.spikes||{}).Empathy],
+    ['ACGME PROF1','Compassion, integrity and respect for others', (d.spikes||{}).Invitation],
+    ['SPIKES (Baile 2000)','Six-step protocol for delivering bad news', Math.round(d.overall/20)],
+  ];
+  $('comp').innerHTML=comp.map(([k,t,v])=>`<div><b>${k}</b>${t}<div class="d" style="font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px">${v!=null?'Level '+v+' of 5':''}</div></div>`).join('');
+  const rec={id:S.scenario.id,title:S.scenario.title,at:Date.now(),overall:d.overall,spikes:d.spikes||{},faculty:false};
+  const ss=sessions(); ss.push(rec); localStorage.setItem('bedside_sessions',JSON.stringify(ss)); S.lastSession=rec;
   const cost = S.usage.in*PRICE.in + S.usage.out*PRICE.out;
   $('costThis').textContent = '$'+cost.toFixed(3);
-  $('costReps').textContent = cost>0 ? Math.round(120/cost).toLocaleString()+'×' : '—';
+  $('costReps').textContent = cost>0 ? Math.round(665/cost).toLocaleString()+'×' : '—';
 }
 $('btnAgain').onclick=()=>startScenario(S.scenario.id);
-$('btnOther').onclick=()=>show('home');
+$('btnOther').onclick=()=>{ show('home'); renderScenarios(); };
+$('btnPrint').onclick=()=>window.print();
+$('btnFaculty').onclick=()=>{ const ss=sessions(); if(ss.length){ ss[ss.length-1].faculty=true; localStorage.setItem('bedside_sessions',JSON.stringify(ss)); } $('btnFaculty').textContent='Review requested ✓'; $('btnFaculty').disabled=true; toast('Debrief flagged for faculty review'); };
 
 /* ---------------- init ---------------- */
 renderScenarios(); setupRecognition(); loadElVoices();
