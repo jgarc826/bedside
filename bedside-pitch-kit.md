@@ -1,11 +1,8 @@
-# Bedside Pitch Kit
-
-Everything the team needs for the hackathon pitch. Numbers, sources, competitive intel, Q&A prep.
-No fluff. Read it in 5 minutes, know it cold.
+# Bedside: The Evidence
 
 ---
 
-## 1. The Problem (in one paragraph)
+## 1. The Problem
 
 Every year 35,000 new medical students enter US programs and must learn to deliver devastating news:
 cancer diagnoses, stillbirths, end-of-life conversations. The training method is standardized patients (SPs),
@@ -68,7 +65,7 @@ claims trace to communication failures, not clinical errors.
 
 ---
 
-## 3. SOPHIE Paper (the research we build on)
+## 3. SOPHIE Paper
 
 **Paper:** "AI Standardized Patient Improves Human Conversations in Advanced Cancer Care"
 **Authors:** Haut, Hasan, Carroll, Epstein, Sen, Hoque (University of Rochester)
@@ -115,72 +112,29 @@ This validates our design choice: cartoon face, great feedback > photorealistic 
 
 ---
 
-## 5. Our Differentiation (say this, not that)
+## 5. Positioning
 
-**Don't say:** "We're better than SOPHIE."
-**Say:** "SOPHIE proved AI patient training works. We made it accessible."
+### Validated by research, built for real-world access
 
-**Don't say:** "Our avatar is simpler."
-**Say:** "Their own data shows feedback matters 38% more than avatar realism. We optimized for the right thing."
+SOPHIE proved that AI patient training produces statistically significant learning gains (p < 0.004).
+Their own participants rated feedback quality (4.7/5) 38% higher than avatar realism (3.4/5).
+Bedside is designed around that finding.
 
-**Don't say:** "It's just an HTML file."
-**Say:** "No server, no install, no IT department. A student can open this on their phone tonight."
+| Dimension | Prior art | Bedside |
+|---|---|---|
+| Infrastructure | Unreal Engine 5.1, Metahuman, dedicated server | One HTML file, any browser |
+| Cost per session | $120-200 (human SP) | $0.04-0.08 |
+| Scenario coverage | Single scenario (lung cancer) | Multiple scenarios, extensible |
+| Deployment | IT involvement, scheduling, facility | Student opens a link tonight |
+| Feedback model | SPIKES-based (same) | SPIKES-based + hidden emotional state + intent-vs-impact analysis |
 
-**Don't say:** "We're cheaper."
-**Say:** "We replace a $120 encounter with a four-cent one. The school doesn't need new budget."
+### Core thesis
 
----
-
-## 6. The Pitch (90 seconds, then demo)
-
-**[OPEN — 15 sec]**
-
-Imagine you're 26 years old. You just finished medical school. You walk into a room, and you have
-to tell a mother that her child's tumor is back. You've done this once before. In a simulation.
-With an actor. For 15 minutes. Two years ago.
-
-That was your training.
-
-**[THE BROKEN SYSTEM — 20 sec]**
-
-Every year, 35,000 new medical students in the US need to learn how to deliver the worst news of
-someone's life. Schools hire actors for this. Fifteen minutes with an actor costs $120 to $200.
-That's $8 a minute just to practice talking. So students get one, maybe three reps across four years.
-
-And then we're surprised that 40% of malpractice claims come from communication failures.
-Not wrong diagnoses. Wrong words.
-
-**[THE SOLUTION — 10 sec]**
-
-That's why we built Bedside. An AI patient who listens to you, reacts like a real person, and tells
-you what she actually understood when you're done. One session costs four cents.
-
-**[TRANSITION TO DEMO — 10 sec]**
-
-Let me show you. I'm going to tell Linda she has pancreatic cancer. First, I'll do what most
-nervous residents do: jump straight to the diagnosis. Watch her face.
-
-*[DEMO: ~90 sec]*
-
-**[BUSINESS — 15 sec]**
-
-We sell to medical schools, out of budgets they already have. We replace a $120 encounter with a
-four-cent one, and give students unlimited reps instead of three. We start with 197 US MD and DO
-programs. Then nursing, PA, and residency: another 400,000 students a year who get almost no
-practice at all.
-
-**[CLOSE — 10 sec]**
-
-A year ago, a Rochester study proved that AI patient training works. We made it one HTML file
-that any student can open tonight.
-
-Nobody should have their first real conversation about death be their first conversation about death.
-
-*[Hold silence. No "thank you."]*
+The scientific question, "Does AI patient training work?", is answered. The remaining question is access and cost. Bedside answers both.
 
 ---
 
-## 7. Judge Q&A (memorize these)
+## 6. FAQ
 
 **"Isn't this just ChatGPT with a prompt?"**
 The patient maintains a hidden trust and emotion state that moves based on specific communication
@@ -220,7 +174,7 @@ communication skills (p < 0.004). We plan pilot studies in Year 1. The scientifi
 
 ---
 
-## 8. Sources
+## 7. Sources
 
 ### Research papers
 - Haut et al. (2025). "AI Standardized Patient Improves Human Conversations in Advanced Cancer Care." arXiv:2505.02694. https://arxiv.org/abs/2505.02694
@@ -245,19 +199,6 @@ communication skills (p < 0.004). We plan pilot studies in Year 1. The scientifi
 
 ### Regulatory
 - USMLE Step 2 CS discontinuation (2021). https://www.usmle.org/frequently-asked-questions
-
----
-
-## 9. Demo Flow (for the person driving the laptop)
-
-1. Home screen. Three scenarios visible. Pitcher says: "Pick the one every student dreads."
-2. Click pancreatic cancer scenario. Linda speaks first.
-3. **Do it WRONG.** Jump to "the biopsy showed adenocarcinoma." Watch face shut down.
-   Toggle instructor view: show trust dropping, show her inner thought.
-4. **Restart. Do it RIGHT.** Ask what she knows. Warning shot. Plain language. Pause. Name emotion.
-   Watch face come back. Trust climbing.
-5. End conversation. Scorecard loads. Point at a specific "fix" moment that quotes your own words.
-6. Optional: mention the cost line. "This session: four cents."
 
 ---
 
