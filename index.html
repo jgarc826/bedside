@@ -15,7 +15,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5}
-  body{border-top:3px dotted var(--ink);border-bottom:3px dotted var(--ink);min-height:100vh}
+  body{min-height:100vh}
   h1,h2,h3{font-family:var(--slab);font-weight:300;letter-spacing:-.01em;margin:0}
   h1 b,h2 b,h3 b{font-weight:700}
   button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:10px 16px;background:var(--ink);color:#fff;font-weight:500}
@@ -24,8 +24,8 @@
   button:disabled{opacity:.45;cursor:not-allowed}
   input,textarea{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);width:100%}
   textarea{resize:none}
-  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
-  header.top{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+  .wrap{max-width:1040px;margin:0 auto;padding:24px 16px 48px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:56px}
   .brand{display:flex;align-items:center;gap:10px}
   .brand .mark{width:30px;height:30px;border-radius:50%;background:var(--sky);display:grid;place-items:center;color:var(--ink);font-family:var(--slab);font-weight:700}
   .brand h1{font-size:22px;font-weight:400}
@@ -34,20 +34,17 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
   .grid{display:grid;gap:16px}
   @media(min-width:760px){.grid.cols-3{grid-template-columns:repeat(3,1fr)} .grid.cols-2{grid-template-columns:1fr 1fr}}
-  .nav{display:flex;gap:4px;margin-left:auto;margin-right:16px}
-  .nav a{font-size:14px;padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500}
-  .nav a.on{color:var(--ink);background:#fff;border:1px solid var(--line)}
-  .nav a.soon{opacity:.5;cursor:default}
-  .who-chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px}
-  .who-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--sky)}
-  .filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-  .filters a{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--muted);cursor:pointer}
-  .filters a.on{color:var(--ink);border-color:var(--ink)}
-  .meta{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
-  .done{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--sky-soft);padding:3px 8px;border-radius:999px;float:right}
-  .trust-row{display:grid;gap:14px;margin-top:28px;font-size:14px;color:var(--muted)}
-  @media(min-width:760px){.trust-row{grid-template-columns:1fr 1fr 1fr}}
-  .trust-row b{color:var(--ink);display:block;margin-bottom:2px}
+  .gear{background:transparent;color:var(--muted);padding:8px;border-radius:50%;border:1px solid transparent}
+  .gear:hover{color:var(--ink);background:#fff;border-color:var(--line)}
+  .more{display:inline-block;margin-top:24px;font-size:14px;color:var(--muted);text-decoration:underline;cursor:pointer}
+  .scenario{display:flex;gap:16px;align-items:flex-start;position:relative;outline:none}
+  .scenario.selected,.scenario:focus{border-color:var(--ink)}
+  .scenario .thumb{width:96px;height:96px;flex:none;border-radius:50%;background:var(--sky);overflow:hidden}
+  .scenario .thumb svg{width:100%;height:100%}
+  .scenario .body{flex:1;min-width:0}
+  .scenario .start{position:absolute;right:16px;bottom:14px;font-size:13px;font-weight:600;opacity:0;transition:opacity .15s}
+  .scenario:hover .start,.scenario:focus .start,.scenario.selected .start{opacity:1}
+  .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:12px}
   @media(min-width:760px){.grid.cols-4{grid-template-columns:repeat(4,1fr)}}
   .tile{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px}
   .tile b{display:block;font-family:var(--slab);font-size:34px;font-weight:300;line-height:1.1}
@@ -63,19 +60,19 @@
   @media(min-width:760px){.comp{grid-template-columns:1fr 1fr}}
   .comp div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .comp b{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
-  .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .foot{text-align:center;margin-top:64px;font-size:13px;color:var(--muted)}
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:60}
   .toast.on{opacity:1}
   @media print{.nav,.who-chip,.foot,button{display:none!important} body{border:0}}
   .scenario{cursor:pointer;transition:transform .12s,border-color .12s}
   .scenario:hover{transform:translateY(-2px);border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-soft)}
   .scenario .diff{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:inline-block;margin-bottom:12px}
-  .scenario h3{font-size:22px;font-weight:400;margin-bottom:8px;line-height:1.2}
-  .scenario p{margin:0;color:var(--muted);font-size:15px;font-family:var(--serif)}
+  .scenario h3{font-size:20px;font-weight:400;margin-bottom:6px;line-height:1.2}
+  .scenario p{margin:0;color:var(--muted);font-size:14px;font-family:var(--serif)}
   .keyrow{display:flex;gap:10px;align-items:center;margin-top:10px}
   .keyrow input{flex:1}
   .hint{font-size:13px;color:var(--muted);margin-top:8px}
-  .hero{margin-bottom:28px}
+  .hero{margin-bottom:48px}
   .hero h2{font-size:40px;line-height:1.15;margin-bottom:12px;max-width:820px}
   .hero p{color:var(--muted);max-width:640px;margin:0;font-family:var(--serif);font-size:17px}
   .err{background:var(--bad-soft);color:var(--bad);padding:10px 12px;border-radius:10px;font-size:13px;margin-top:10px;display:none}
@@ -166,30 +163,19 @@
 <body>
 <div class="wrap">
   <header class="top">
-    <div class="brand"><div class="mark">B</div><div><h1>Bedside</h1><div class="tag">Communication skills simulation</div></div></div>
-    <nav class="nav">
-      <a id="navHome" class="on">Scenarios</a>
-      <a id="navProgress">My progress</a>
-      <a class="soon" title="Coming soon">Faculty</a>
-      <a id="navSettings">Settings</a>
-    </nav>
-    <div class="who-chip"><span class="dot"></span>MS3 · Clinical Skills</div>
+    <div class="brand"><div class="mark">B</div><div><h1>Bedside</h1></div></div>
+    <button class="gear" id="navSettings" title="Settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   </header>
 
   <!-- HOME -->
   <section class="screen active" id="home">
     <div class="hero">
-      <div class="tag" style="margin-bottom:10px">Scenario library</div>
       <h2>Practice the <b>conversation no one wants to have.</b> As many times as you need.</h2>
-      <p>Simulated patients who react like people. A SPIKES debrief that quotes your own words. Aligned to the AAMC Core EPAs and the ACGME Interpersonal and Communication Skills competency.</p>
+      <p>Talk to a simulated patient who reacts like a person. Get a SPIKES debrief that quotes your own words.</p>
     </div>
-    <div class="filters" id="filters"></div>
     <div class="grid cols-3" id="scenarios"></div>
-    <div class="trust-row">
-      <div><b>No real patient data.</b> Every patient is simulated. Nothing you say leaves your browser except the conversation text sent to the AI model.</div>
-      <div><b>Evidence-based.</b> Scoring follows the SPIKES protocol (Baile et al., 2000), the framework taught in most US medical schools.</div>
-      <div><b>Unlimited repetitions.</b> A session costs a few cents in model usage, compared with hundreds of dollars for a standardized-patient encounter.</div>
-    </div>
+    <a class="more" id="moreLink">More scenarios (3)</a>
+    <div class="grid cols-3" id="scenariosMore" style="display:none;margin-top:16px"></div>
   </section>
 
   <!-- PROGRESS -->
@@ -322,10 +308,7 @@
     </div>
     <div class="err" id="dbErr"></div>
   </section>
-  <footer class="foot">
-    <div>© 2026 Bedside · Simulated patients only. Not a medical device. No real patient information is collected or stored.</div>
-    <div class="tag">SPIKES · AAMC Core EPA 1 · ACGME ICS1</div>
-  </footer>
+  <footer class="foot">Simulated patients only. Nothing leaves your browser except the conversation text sent to the model.</footer>
 </div>
 
 <script>
@@ -745,25 +728,37 @@ function stopRec(){ try{ rec && rec.stop(); }catch{} }
 function toggleRec(){ if (!rec) return; if (S.recognizing) stopRec(); else { try{ rec.start(); }catch(e){} } }
 
 /* ---------------- ui: home ---------------- */
-let FILTER='All';
 function sessions(){ try{ return JSON.parse(localStorage.getItem('bedside_sessions')||'[]'); }catch{ return []; } }
+let SELECTED = 'chen';
+async function thumb(el, look){
+  const [f,h,n,g,e,b,m] = await Promise.all([part('face',look.face),part('hair',look.hair),part('nose',look.nose),look.glasses!=null?part('glasses',look.glasses):'',part('eyes',0),part('eyebrows',0),part('mouth',0)]);
+  el.innerHTML = `<svg viewBox="150 160 700 700"><g fill="#fff">${f}</g>${h}${b}${e}${n}${m}${g}</svg>`;
+}
+function card(sc){
+  return `<div class="card scenario ${sc.id===SELECTED?'selected':''}" data-id="${sc.id}" tabindex="0" role="button" aria-label="Start ${sc.title}">
+      <div class="thumb" data-thumb="${sc.id}"></div>
+      <div class="body">
+        <h3>${sc.title}</h3>
+        <p>${sc.name}, ${sc.age}. ${sc.teaser}</p>
+        <div class="meta">${sc.meta.specialty.split(' / ')[0]} · ${sc.meta.mins} min</div>
+      </div>
+      <span class="start">Start →</span>
+    </div>`;
+}
 function renderScenarios(){
-  const specs=['All',...new Set(SCENARIOS.map(s=>s.meta.specialty))];
-  $('filters').innerHTML=specs.map(x=>`<a class="${x===FILTER?'on':''}" data-f="${x}">${x}</a>`).join('');
-  document.querySelectorAll('#filters a').forEach(a=>a.onclick=()=>{FILTER=a.dataset.f; renderScenarios();});
-  const done={}; sessions().forEach(x=>{ done[x.id]=Math.max(done[x.id]||0,x.overall); });
-  $('scenarios').innerHTML = SCENARIOS.filter(s=>FILTER==='All'||s.meta.specialty===FILTER).map(s=>`
-    <div class="card scenario" data-id="${s.id}">
-      ${done[s.id]?`<span class="done">Best ${done[s.id]}</span>`:''}
-      <div class="diff">${s.difficulty}</div>
-      <h3>${s.title}</h3>
-      <p>${s.name}, ${s.age}. ${s.teaser}</p>
-      <div class="meta"><span>${s.meta.specialty}</span><span>~${s.meta.mins} min</span><span>${s.meta.focus}</span></div>
-    </div>`).join('');
-  document.querySelectorAll('.scenario').forEach(el=>el.onclick=()=>startScenario(el.dataset.id));
+  $('scenarios').innerHTML = SCENARIOS.slice(0,3).map(card).join('');
+  $('scenariosMore').innerHTML = SCENARIOS.slice(3).map(card).join('');
+  document.querySelectorAll('.scenario').forEach(el=>{
+    el.onclick=()=>startScenario(el.dataset.id);
+    el.onfocus=()=>{ SELECTED=el.dataset.id; document.querySelectorAll('.scenario').forEach(x=>x.classList.toggle('selected',x===el)); };
+    el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); startScenario(el.dataset.id); } };
+    const t=el.querySelector('.thumb'); thumb(t, SCENARIOS.find(s=>s.id===el.dataset.id).look);
+  });
   $('apikey').value = localStorage.getItem('bedside_key') ? '••••••••••••••••' : '';
   $('elkey').value = localStorage.getItem('bedside_elkey') ? '••••••••••••••••' : '';
 }
+$('moreLink').onclick=()=>{ const m=$('scenariosMore'); const open=m.style.display==='none'; m.style.display=open?'':'none'; $('moreLink').textContent=open?'Fewer scenarios':'More scenarios (3)'; };
+document.addEventListener('keydown', e=>{ if (e.key==='Enter' && $('home').classList.contains('active') && !['INPUT','TEXTAREA','BUTTON','A'].includes(document.activeElement.tagName) && !document.activeElement.classList.contains('scenario')) startScenario(SELECTED); });
 function renderProgress(){
   const ss=sessions(); const order=['Setting','Perception','Invitation','Knowledge','Empathy','Strategy'];
   const avg=ss.length?Math.round(ss.reduce((a,x)=>a+x.overall,0)/ss.length):0;
@@ -774,14 +769,12 @@ function renderProgress(){
   $('sessionList').innerHTML= ss.length ? ss.slice().reverse().map(x=>`<div class="sess"><div><div>${escapeHtml(x.title)}</div><div class="d">${new Date(x.at).toLocaleString()}${x.faculty?' · Review requested':''}</div></div><div class="sc">${x.overall}</div></div>`).join('') : '<div class="hint">No sessions yet. Complete a scenario to start your record.</div>';
 }
 function toast(msg){ let t=document.querySelector('.toast'); if(!t){ t=document.createElement('div'); t.className='toast'; document.body.appendChild(t);} t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2200); }
-$('navHome').onclick=()=>{ show('home'); renderScenarios(); };
-$('navProgress').onclick=()=>{ renderProgress(); show('progress'); };
 $('navSettings').onclick=()=>$('settings').classList.add('on');
 $('closeSettings').onclick=()=>$('settings').classList.remove('on');
 $('settings').onclick=e=>{ if(e.target===$('settings')) $('settings').classList.remove('on'); };
 $('saveKey').onclick=()=>{ const v=$('apikey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_key', v); $('apikey').value='••••••••••••••••'; } };
 $('saveElKey').onclick=()=>{ const v=$('elkey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_elkey', v); $('elkey').value='••••••••••••••••'; EL.voices=null; loadElVoices(); } };
-function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); $('navHome').classList.toggle('on', id==='home'||id==='encounter'||id==='debrief'); $('navProgress').classList.toggle('on', id==='progress'); if (id!=='encounter'){ stopSpeech(); stopRec(); } window.scrollTo(0,0); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); if (id!=='encounter'){ stopSpeech(); stopRec(); } window.scrollTo(0,0); }
 
 /* ---------------- ui: encounter ---------------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
