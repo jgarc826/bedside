@@ -32,7 +32,7 @@
   input,textarea{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);width:100%}
   textarea{resize:none}
   .wrap{max-width:1040px;margin:0 auto;padding:24px 16px 48px}
-  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:56px}
+  header.top{display:flex;align-items:center;gap:12px;margin-bottom:44px}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;cursor:pointer}
   .back{display:inline-block;margin-right:12px;color:var(--muted);text-decoration:none;cursor:pointer;font-weight:500}
   .back:hover{color:var(--ink)}
@@ -52,6 +52,15 @@
   .hero2-face{background:var(--sky);border-radius:28px;aspect-ratio:1.05;overflow:hidden;display:grid;place-items:center;min-height:300px}
   .hero2-face svg{height:104%;width:auto;margin-top:8%}
   .scenario h3{font-size:18px;font-weight:400;margin-bottom:4px;line-height:1.25}
+  .nav{display:flex;gap:4px;margin-left:auto;margin-right:16px}
+  .nav a{font-size:14px;padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500}
+  .nav a.on{color:var(--ink);background:#fff;border:1px solid var(--line)}
+  .nav a.soon{opacity:.5;cursor:default}
+  .who-chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;white-space:nowrap}
+  .who-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--sky)}
+  .trust-row{display:grid;gap:14px;margin-top:40px;font-size:14px;color:var(--muted)}
+  @media(min-width:760px){.trust-row{grid-template-columns:1fr 1fr 1fr}}
+  .trust-row b{color:var(--ink);display:block;margin-bottom:2px}
   .gear{background:transparent;color:var(--muted);padding:8px;border-radius:50%;border:1px solid transparent}
   .gear:hover{color:var(--ink);background:#fff;border-color:var(--line)}
   .more{display:inline-block;margin-top:24px;font-size:14px;color:var(--muted);text-decoration:underline;cursor:pointer}
@@ -181,7 +190,13 @@
 <main class="wrap">
   <header class="top">
     <a class="brand" id="brandHome" href="#" aria-label="Bedside home"><div class="mark">B</div><div><h1>Bedside</h1></div></a>
-    <button class="gear" id="navSettings" title="Settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    <nav class="nav">
+      <a id="navHome" class="on">Scenarios</a>
+      <a id="navProgress">My progress</a>
+      <a class="soon" title="Coming soon">Faculty</a>
+      <a id="navSettings">Settings</a>
+    </nav>
+    <div class="who-chip"><span class="dot"></span>MS3 · Clinical Skills</div>
   </header>
 
   <!-- HOME -->
@@ -190,6 +205,11 @@
     <div class="grid cols-3" id="scenarios"></div>
     <a class="more" id="moreLink">More scenarios (3)</a>
     <div class="grid cols-3" id="scenariosMore" style="display:none;margin-top:16px"></div>
+    <div class="trust-row">
+      <div><b>No real patient data.</b> Every patient is simulated. Nothing you say leaves your browser except the conversation text sent to the AI model.</div>
+      <div><b>Evidence-based.</b> Scoring follows the SPIKES protocol (Baile et al., 2000), the framework taught in most US medical schools.</div>
+      <div><b>Unlimited repetitions.</b> A session costs a few cents in model usage, compared with $665 for a standardized-patient simulation.</div>
+    </div>
   </section>
 
   <!-- PROGRESS -->
@@ -815,6 +835,8 @@ function renderProgress(){
 }
 function toast(msg){ let t=document.querySelector('.toast'); if(!t){ t=document.createElement('div'); t.className='toast'; document.body.appendChild(t);} t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2200); }
 $('navSettings').onclick=()=>$('settings').classList.add('on');
+$('navHome').onclick=()=>{ show('home'); renderScenarios(); };
+$('navProgress').onclick=()=>{ renderProgress(); show('progress'); };
 $('closeSettings').onclick=()=>$('settings').classList.remove('on');
 $('schoolsLink').onclick=()=>$('schools').classList.add('on');
 $('closeSchools').onclick=()=>$('schools').classList.remove('on');
@@ -823,7 +845,7 @@ $('btnDemo').onclick=()=>{ $('btnDemo').textContent='Request received ✓'; $('b
 $('settings').onclick=e=>{ if(e.target===$('settings')) $('settings').classList.remove('on'); };
 $('saveKey').onclick=()=>{ const v=$('apikey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_key', v); $('apikey').value='••••••••••••••••'; } };
 $('saveElKey').onclick=()=>{ const v=$('elkey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_elkey', v); $('elkey').value='••••••••••••••••'; EL.voices=null; loadElVoices(); } };
-function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); if (id!=='encounter'){ stopSpeech(); stopRec(); } window.scrollTo(0,0); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); $('navHome').classList.toggle('on', id!=='progress'); $('navProgress').classList.toggle('on', id==='progress'); if (id!=='encounter'){ stopSpeech(); stopRec(); } window.scrollTo(0,0); }
 
 /* ---------------- ui: encounter ---------------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
