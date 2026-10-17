@@ -109,7 +109,7 @@
   .encbar .l{font-size:13px;color:var(--muted)}
   .encbar .l b{color:var(--ink);font-weight:600}
   .briefPanel{display:none;margin-bottom:12px;font-size:14px}
-  .briefPanel.on{display:grid;gap:12px}
+  .briefPanel.on{display:grid;gap:14px}
   @media(min-width:760px){.briefPanel.on{grid-template-columns:1fr 1fr}}
   .briefPanel b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
   .encGrid{display:grid;gap:14px}
@@ -259,9 +259,9 @@
       <div class="l"><a id="backHome" class="back">← Scenarios</a><b id="encName"></b> · <span id="encTitle"></span> · <a id="briefToggle" style="cursor:pointer;text-decoration:underline">hide brief</a></div>
       <div style="display:flex;gap:8px"><button class="secondary" id="btnRestart">Restart</button><button id="btnEnd">End conversation →</button></div>
     </div>
-    <div class="briefPanel card on" id="briefPanel">
-      <div><b>Your role</b><div id="ptRole"></div></div>
-      <div><b>What you know</b><div id="ptFacts"></div></div>
+    <div class="briefPanel on" id="briefPanel">
+      <div class="card"><b>Your role</b><div id="ptRole"></div></div>
+      <div class="card"><b>What you know</b><div id="ptFacts"></div></div>
     </div>
 
     <div class="encGrid">
