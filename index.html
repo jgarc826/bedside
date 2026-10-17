@@ -43,12 +43,21 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
   .grid{display:grid;gap:16px}
   @media(min-width:760px){.grid.cols-3{grid-template-columns:repeat(3,1fr)} .grid.cols-2{grid-template-columns:1fr 1fr}}
+  .hero2{display:grid;gap:28px;align-items:center;margin-bottom:44px}
+  @media(min-width:860px){.hero2{grid-template-columns:1.15fr .85fr}}
+  .hero2 h2{font-size:40px;line-height:1.12;margin-bottom:14px}
+  .hero2 p{color:var(--muted);font-family:var(--serif);font-size:17px;margin:0 0 22px;max-width:520px}
+  .cta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .cta button{font-size:16px;padding:14px 22px;border-radius:999px}
+  .hero2-face{background:var(--sky);border-radius:28px;aspect-ratio:1.05;overflow:hidden;display:grid;place-items:center;min-height:300px}
+  .hero2-face svg{height:104%;width:auto;margin-top:8%}
+  .scenario h3{font-size:18px;font-weight:400;margin-bottom:4px;line-height:1.25}
   .gear{background:transparent;color:var(--muted);padding:8px;border-radius:50%;border:1px solid transparent}
   .gear:hover{color:var(--ink);background:#fff;border-color:var(--line)}
   .more{display:inline-block;margin-top:24px;font-size:14px;color:var(--muted);text-decoration:underline;cursor:pointer}
   .scenario{display:flex;gap:16px;align-items:flex-start;position:relative;outline:none}
   .scenario.selected,.scenario:focus{border-color:var(--ink)}
-  .scenario .thumb{width:96px;height:96px;flex:none;border-radius:50%;background:var(--sky);overflow:hidden}
+  .scenario .thumb{width:72px;height:72px;flex:none;border-radius:50%;background:var(--sky);overflow:hidden}
   .scenario .thumb svg{width:100%;height:100%}
   .scenario .body{flex:1;min-width:0}
   .scenario .start{position:absolute;right:16px;bottom:14px;font-size:13px;font-weight:600;opacity:0;transition:opacity .15s}
@@ -76,8 +85,7 @@
   .scenario{cursor:pointer;transition:transform .12s,border-color .12s}
   .scenario:hover{transform:translateY(-2px);border-color:var(--sky);box-shadow:0 0 0 3px var(--sky-soft)}
   .scenario .diff{font-family:var(--mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:inline-block;margin-bottom:12px}
-  .scenario h3{font-size:20px;font-weight:400;margin-bottom:6px;line-height:1.2}
-  .scenario p{margin:0;color:var(--muted);font-size:14px;font-family:var(--serif)}
+    .scenario p{margin:0;color:var(--muted);font-size:13.5px;font-family:var(--serif);line-height:1.4}
   .keyrow{display:flex;gap:10px;align-items:center;margin-top:10px}
   .keyrow input{flex:1}
   .hint{font-size:13px;color:var(--muted);margin-top:8px}
@@ -178,10 +186,15 @@
 
   <!-- HOME -->
   <section class="screen active" id="home" aria-label="Scenario library">
-    <div class="hero">
-      <h2>Practice the <b>conversation no one wants to have.</b> As many times as you need.</h2>
-      <p>Talk to a simulated patient who reacts like a person. Get a SPIKES debrief that quotes your own words.</p>
+    <div class="hero2">
+      <div class="hero2-text">
+        <h2>Practice the <b>conversation no one wants to have.</b> As many times as you need.</h2>
+        <p>Talk to a simulated patient who reacts like a person. Get a SPIKES debrief that quotes your own words.</p>
+        <div class="cta"><button id="btnHeroStart">Start a practice visit →</button><span class="hint" id="ctaHint"></span></div>
+      </div>
+      <div class="hero2-face" id="heroFace" aria-hidden="true"></div>
     </div>
+    <div class="tag" style="margin-bottom:12px">Choose a patient</div>
     <div class="grid cols-3" id="scenarios"></div>
     <a class="more" id="moreLink">More scenarios (3)</a>
     <div class="grid cols-3" id="scenariosMore" style="display:none;margin-top:16px"></div>
@@ -347,7 +360,7 @@ const SCENARIOS = [
   {
     id:'chen', name:'Linda Chen', age:58, pronouns:'she/her', voice:'female',
     look:{face:0, hair:22, nose:1},
-    difficulty:'Core', title:'Biopsy results: pancreatic cancer',
+    difficulty:'Core', title:'Pancreatic cancer biopsy',
     teaser:'She thinks the mass was probably a cyst. It isn\'t.',
     role:'You are a third-year medical student on the GI service. The attending has asked you to share the biopsy result and the next steps with Mrs. Chen, then they will join.',
     facts:'CT showed a 3 cm mass in the head of the pancreas. Biopsy confirms adenocarcinoma. Staging is pending; oncology referral is being placed. She was told two weeks ago it was "probably benign, but let\'s be sure."',
@@ -357,7 +370,7 @@ const SCENARIOS = [
   {
     id:'alvarez', name:'Maria Alvarez', age:31, pronouns:'she/her', voice:'female',
     look:{face:5, hair:30, nose:3},
-    difficulty:'Hard', title:'Missed miscarriage at 11 weeks',
+    difficulty:'Hard', title:'Missed miscarriage',
     teaser:'She came in for a routine scan. There is no heartbeat.',
     role:'You are a student on the OB/GYN rotation. The ultrasound tech stepped out and asked you to speak with Ms. Alvarez while the resident finishes with another patient.',
     facts:'Ultrasound shows a fetal pole measuring 8 weeks 4 days with no cardiac activity. Dates were confirmed at 7 weeks with a heartbeat. This is a missed miscarriage. Options will be expectant management, misoprostol, or D&C, to be discussed with the resident.',
@@ -383,7 +396,7 @@ SCENARIOS.push(
   {
     id:'reyes', name:'Daniela Reyes', age:34, pronouns:'she/her', voice:'female',
     look:{face:3, hair:53, nose:2}, meta:{specialty:'Pediatrics', focus:'Knowledge · Strategy', mins:8},
-    difficulty:'Core', title:'New type 1 diabetes in a six-year-old',
+    difficulty:'Core', title:'Type 1 diabetes, age six',
     teaser:'A mother in the ED. Her daughter\'s glucose was 480.',
     role:'You are a student in the pediatric emergency department. Sofia, 6, has been diagnosed with new-onset type 1 diabetes and is being admitted. You need to explain the diagnosis to her mother, who is waiting outside the room.',
     facts:'Glucose 480, mild DKA, admitted to the pediatric floor for insulin initiation and diabetes education. Sofia is stable. This is lifelong and will require daily insulin, but children with type 1 diabetes live full lives.',
@@ -393,7 +406,7 @@ SCENARIOS.push(
   {
     id:'okafor', name:'Marcus Okafor', age:24, pronouns:'he/him', voice:'male',
     look:{face:7, hair:36, nose:4}, meta:{specialty:'Internal Medicine', focus:'Setting · Knowledge', mins:8},
-    difficulty:'Hard', title:'A positive HIV test',
+    difficulty:'Hard', title:'Positive HIV test',
     teaser:'He came in for a routine screen before a new job.',
     role:'You are a student in a primary care clinic. Mr. Okafor had routine labs last week. His fourth-generation HIV test and confirmatory assay are both positive. You need to tell him the result.',
     facts:'HIV-1 positive, confirmed. CD4 and viral load are pending. With modern antiretroviral therapy, life expectancy is near normal and undetectable viral load means the virus cannot be transmitted sexually. Same-day treatment start is available.',
@@ -403,7 +416,7 @@ SCENARIOS.push(
   {
     id:'brennan', name:'Patricia Brennan', age:66, pronouns:'she/her', voice:'female',
     look:{face:12, hair:55, nose:0, glasses:4}, meta:{specialty:'Critical Care', focus:'Empathy · Strategy', mins:12},
-    difficulty:'Hard', title:'Family meeting after a massive stroke',
+    difficulty:'Hard', title:'ICU family meeting',
     teaser:'Her husband is on a ventilator. The scan is devastating.',
     role:'You are a student on the neuro ICU team. Mr. Brennan, 68, had a large hemorrhagic stroke yesterday. His wife has been waiting for an update. The attending has asked you to begin the conversation about his prognosis before joining.',
     facts:'Large right hemispheric intracerebral hemorrhage with midline shift. Intubated, not following commands, not improving. Neurosurgery does not recommend surgery. Meaningful neurological recovery is very unlikely. The team wants to understand what Mr. Brennan would have wanted.',
@@ -776,17 +789,29 @@ function card(sc){
     </div>`;
 }
 function renderScenarios(){
-  $('scenarios').innerHTML = SCENARIOS.slice(0,3).map(card).join('');
-  $('scenariosMore').innerHTML = SCENARIOS.slice(3).map(card).join('');
+  const top=['chen','hale','alvarez'].map(id=>SCENARIOS.find(x=>x.id===id));
+  $('scenarios').innerHTML = top.map(card).join('');
+  $('scenariosMore').innerHTML = SCENARIOS.filter(x=>!top.includes(x)).map(card).join('');
   document.querySelectorAll('.scenario').forEach(el=>{
     el.onclick=()=>startScenario(el.dataset.id);
-    el.onfocus=()=>{ SELECTED=el.dataset.id; document.querySelectorAll('.scenario').forEach(x=>x.classList.toggle('selected',x===el)); };
+    el.onfocus=el.onmouseenter=()=>{ if(SELECTED===el.dataset.id) return; SELECTED=el.dataset.id; document.querySelectorAll('.scenario').forEach(x=>x.classList.toggle('selected',x===el)); renderHeroFace(); };
     el.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); startScenario(el.dataset.id); } };
     const t=el.querySelector('.thumb'); thumb(t, SCENARIOS.find(s=>s.id===el.dataset.id).look);
   });
   $('apikey').value = localStorage.getItem('bedside_key') ? '••••••••••••••••' : '';
   $('elkey').value = localStorage.getItem('bedside_elkey') ? '••••••••••••••••' : '';
+  renderHeroFace();
 }
+let heroBlink=null;
+async function renderHeroFace(){
+  const sc=SCENARIOS.find(x=>x.id===SELECTED)||SCENARIOS[0]; const look=sc.look;
+  const [f,h,n,g,e,b,m,ec] = await Promise.all([part('face',look.face),part('hair',look.hair),part('nose',look.nose),look.glasses!=null?part('glasses',look.glasses):'',part('eyes',0),part('eyebrows',0),part('mouth',1),part('eyes',11)]);
+  $('heroFace').innerHTML = `<svg viewBox="60 60 880 880"><g fill="#fff">${f}</g>${h}${b}<g id="heroEyes">${e}</g>${n}${m}${g}</svg>`;
+  $('ctaHint').textContent = sc.name+', '+sc.age+' · '+sc.title;
+  clearInterval(heroBlink);
+  heroBlink=setInterval(()=>{ const el=$('heroEyes'); if(!el) return; el.innerHTML=ec; setTimeout(()=>{ el.innerHTML=e; },120); }, 3200+Math.random()*2000);
+}
+$('btnHeroStart').onclick=()=>startScenario(SELECTED);
 $('moreLink').onclick=()=>{ const m=$('scenariosMore'); const open=m.style.display==='none'; m.style.display=open?'':'none'; $('moreLink').textContent=open?'Fewer scenarios':'More scenarios (3)'; };
 document.addEventListener('keydown', e=>{ if (e.key==='Enter' && $('home').classList.contains('active') && !['INPUT','TEXTAREA','BUTTON','A'].includes(document.activeElement.tagName) && !document.activeElement.classList.contains('scenario')) startScenario(SELECTED); });
 function renderProgress(){
