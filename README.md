@@ -8,6 +8,8 @@ Built in one afternoon at the DiversaTech hackathon (UC Berkeley, Oct 17 2026).
 
 Open `index.html` in Chrome, paste an Anthropic API key on the home screen, pick a scenario, and talk.
 
+Optional: add an ElevenLabs API key for a natural, emotional patient voice. Without it the browser's built-in voice is used.
+
 No backend, no build step. Voice input and output use the browser's Web Speech API. The patient and the grader are two prompts to the Claude API called directly from the browser. Your key stays in your browser's local storage.
 
 ## Why

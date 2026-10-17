@@ -138,6 +138,9 @@
       <b style="font-size:14px">Anthropic API key</b>
       <div class="keyrow"><input id="apikey" type="password" placeholder="sk-ant-..." autocomplete="off"><button class="secondary" id="saveKey">Save</button></div>
       <div class="hint">Stored only in this browser. A full session costs a few cents.</div>
+      <b style="font-size:14px;display:block;margin-top:16px">ElevenLabs API key <span style="font-weight:400;color:var(--muted)">(optional, for a natural voice)</span></b>
+      <div class="keyrow"><input id="elkey" type="password" placeholder="xi-..." autocomplete="off"><button class="secondary" id="saveElKey">Save</button></div>
+      <div class="hint" id="elStatus">Without it the patient uses the browser's built-in voice.</div>
       <div class="err" id="homeErr"></div>
     </div>
   </section>
@@ -296,7 +299,7 @@ const EMOTIONS = ['calm','hopeful','anxious','guarded','confused','shocked','sad
 
 /* ---------------- state ---------------- */
 const S = { scenario:null, messages:[], usage:{in:0,out:0}, trust:55, emotion:'anxious', inner:'',
-            recognizing:false, busy:false, faceState:'listening', mouthOpen:false, drift:{x:0,y:0}, blinkLevel:0 };
+            recognizing:false, busy:false, faceState:'listening', mouthOpen:false, mouthAmt:1, drift:{x:0,y:0}, blinkLevel:0 };
 const $ = id => document.getElementById(id);
 const MODEL = 'claude-opus-5-5';
 const PRICE = { in: 4/1e6, out: 20/1e6 };
@@ -442,7 +445,7 @@ function renderFace(){
   // idle gaze drift
   p.gx += S.drift.x; p.gy += S.drift.y;
   const press = S.trust<40 || e==='angry';
-  const openAmt = S.mouthOpen ? (S.trust<40 ? 6 : S.trust<70 ? 9 : 13) : 0;
+  const openAmt = S.mouthOpen ? (S.trust<40 ? 6 : S.trust<70 ? 9 : 13) * (S.mouthAmt||1) : 0;
   const open = Math.max(p.open, openAmt);
   const lid = Math.max(p.lid, S.blinkLevel);
   const v = (k,val)=>stage.style.setProperty(k,val);
@@ -523,7 +526,76 @@ function pickVoice(gender){
 }
 let lip = { osc:null, closeT:null, fallbackT:null };
 function stopLip(){ clearInterval(lip.osc); clearTimeout(lip.closeT); clearTimeout(lip.fallbackT); lip={osc:null,closeT:null,fallbackT:null}; S.mouthOpen=false; }
-function speak(text, emotion){
+/* ---- ElevenLabs voice model (optional) ---- */
+const EL = { voices:null, audio:null, ctx:null, analyser:null, raf:null };
+function elKey(){ return localStorage.getItem('bedside_elkey')||''; }
+async function loadElVoices(){
+  const key=elKey(); if (!key) return null;
+  if (EL.voices) return EL.voices;
+  try {
+    const r = await fetch('https://api.elevenlabs.io/v1/voices', {headers:{'xi-api-key':key}});
+    if (!r.ok) throw new Error('ElevenLabs '+r.status);
+    const j = await r.json(); EL.voices = j.voices||[];
+    const st=$('elStatus'); if (st) st.textContent = 'ElevenLabs connected · '+EL.voices.length+' voices available.';
+    return EL.voices;
+  } catch(e){ const st=$('elStatus'); if (st) st.textContent='ElevenLabs key not working: '+e.message; return null; }
+}
+function pickElVoice(sc){
+  if (sc.elVoice) return sc.elVoice;
+  const vs = EL.voices||[]; const g = sc.voice;
+  const byGender = vs.filter(v=>(v.labels?.gender||'').toLowerCase()===g);
+  const older = byGender.filter(v=>/old|middle/.test((v.labels?.age||'').toLowerCase()));
+  const pool = (sc.age>=60 && older.length) ? older : byGender.length ? byGender : vs;
+  const american = pool.filter(v=>/american/.test((v.labels?.accent||'').toLowerCase()));
+  return (american[0]||pool[0]||{}).voice_id || null;
+}
+function stopElAudio(){
+  cancelAnimationFrame(EL.raf); EL.raf=null;
+  if (EL.audio){ try{ EL.audio.pause(); }catch{} EL.audio.onended=null; EL.audio=null; }
+}
+async function speakEl(text, emotion){
+  const key=elKey(); if (!key) return false;
+  await loadElVoices(); const voiceId = pickElVoice(S.scenario); if (!voiceId) return false;
+  const e = normEmotion(emotion);
+  const heavy = ['sad','shocked','angry','numb'].includes(e) || S.trust<40;
+  const body = { text, model_id:'eleven_turbo_v2_5', voice_settings:{ stability: heavy?0.3:0.5, similarity_boost:0.8, style: heavy?0.45:0.2, use_speaker_boost:true } };
+  const r = await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+voiceId+'?output_format=mp3_44100_128', {
+    method:'POST', headers:{'xi-api-key':key,'content-type':'application/json','accept':'audio/mpeg'}, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error('ElevenLabs '+r.status);
+  const blob = await r.blob(); const url = URL.createObjectURL(blob);
+  const audio = new Audio(url); audio.crossOrigin='anonymous'; EL.audio=audio;
+  // amplitude-driven lip sync
+  try {
+    if (!EL.ctx) { EL.ctx = new (window.AudioContext||window.webkitAudioContext)(); }
+    if (EL.ctx.state==='suspended') await EL.ctx.resume();
+    const src = EL.ctx.createMediaElementSource(audio);
+    const an = EL.ctx.createAnalyser(); an.fftSize=512; an.smoothingTimeConstant=0.5;
+    src.connect(an); an.connect(EL.ctx.destination);
+    const buf = new Uint8Array(an.fftSize);
+    const tick=()=>{
+      an.getByteTimeDomainData(buf); let sum=0; for (let i=0;i<buf.length;i++){ const d=(buf[i]-128)/128; sum+=d*d; }
+      const rms=Math.sqrt(sum/buf.length);
+      S.mouthOpen = rms>0.035; S.mouthAmt = Math.max(0.35, Math.min(1, rms*7)); renderFace();
+      EL.raf=requestAnimationFrame(tick);
+    };
+    audio.onplay=()=>{ setFaceState('speaking'); tick(); };
+  } catch(err){
+    // analyser unavailable: oscillate
+    audio.onplay=()=>{ setFaceState('speaking'); lip.osc=setInterval(()=>{ S.mouthOpen=!S.mouthOpen; renderFace(); },70); };
+  }
+  const done=()=>{ stopElAudio(); stopLip(); S.mouthAmt=1; URL.revokeObjectURL(url); if (S.faceState==='speaking') setFaceState('listening'); else renderFace(); };
+  audio.onended=done; audio.onerror=done;
+  await audio.play();
+  return true;
+}
+function stopSpeech(){ if (typeof speechSynthesis!=='undefined') speechSynthesis.cancel(); stopElAudio(); stopLip(); S.mouthAmt=1; }
+async function speak(text, emotion){
+  stopSpeech();
+  try { if (await speakEl(text, emotion)) return; }
+  catch(e){ console.warn('ElevenLabs failed, falling back to browser voice:', e.message); }
+  speakBrowser(text, emotion);
+}
+function speakBrowser(text, emotion){
   if (typeof speechSynthesis==='undefined') return;
   speechSynthesis.cancel(); stopLip();
   const u = new SpeechSynthesisUtterance(text);
@@ -554,7 +626,7 @@ function setupRecognition(){
   if (!SR) { $('mic').style.display='none'; $('interim').textContent='Voice input not supported in this browser — use "type instead".'; $('composer').classList.add('on'); return; }
   rec = new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=true;
   let finalText='';
-  rec.onstart=()=>{ S.recognizing=true; $('mic').classList.add('live'); stage.classList.add('listening-live'); finalText=''; $('interim').textContent='Listening…'; speechSynthesis.cancel(); stopLip(); setFaceState('listening'); };
+  rec.onstart=()=>{ S.recognizing=true; $('mic').classList.add('live'); stage.classList.add('listening-live'); finalText=''; $('interim').textContent='Listening…'; stopSpeech(); setFaceState('listening'); };
   rec.onresult=e=>{
     let interim='';
     for (let i=e.resultIndex;i<e.results.length;i++){ const t=e.results[i][0].transcript; if (e.results[i].isFinal) finalText+=t+' '; else interim+=t; }
@@ -576,10 +648,12 @@ function renderScenarios(){
     </div>`).join('');
   document.querySelectorAll('.scenario').forEach(el=>el.onclick=()=>startScenario(el.dataset.id));
   $('apikey').value = localStorage.getItem('bedside_key') ? '••••••••••••••••' : '';
+  $('elkey').value = localStorage.getItem('bedside_elkey') ? '••••••••••••••••' : '';
 }
 $('saveKey').onclick=()=>{ const v=$('apikey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_key', v); $('apikey').value='••••••••••••••••'; } };
+$('saveElKey').onclick=()=>{ const v=$('elkey').value.trim(); if (v && !v.startsWith('••')) { localStorage.setItem('bedside_elkey', v); $('elkey').value='••••••••••••••••'; EL.voices=null; loadElVoices(); } };
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); $('btnHome').style.display = id==='home'?'none':'inline-block'; }
-$('btnHome').onclick=()=>{ speechSynthesis.cancel(); stopLip(); stopRec(); show('home'); };
+$('btnHome').onclick=()=>{ stopSpeech(); stopRec(); show('home'); };
 
 /* ---------------- ui: encounter ---------------- */
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -601,7 +675,7 @@ async function sendStudent(){
   $('input').value=''; $('encErr').style.display='none';
   S.messages.push({role:'user', content:text});
   S.busy=true; $('send').disabled=true; $('mic').disabled=true;
-  speechSynthesis.cancel(); stopLip(); setFaceState('thinking');
+  stopSpeech(); setFaceState('thinking');
   try {
     const raw = await claude({system: patientSystem(S.scenario), messages: S.messages, maxTokens: 600, effort:'low'});
     let p; try { p = parseJSON(raw); } catch { p = {say: raw, emotion:S.emotion, trust:S.trust, inner:''}; }
@@ -632,7 +706,7 @@ function transcriptPairs(){
 function transcriptText(){ return transcriptPairs().map(p=>(p.cls==='student'?'STUDENT: ':'PATIENT: ')+p.text).join('\n'); }
 async function endEncounter(){
   if (S.messages.filter(m=>m.role==='user').length===0) { $('encErr').textContent='Say at least one thing to the patient first.'; $('encErr').style.display='block'; return; }
-  speechSynthesis.cancel(); stopLip(); stopRec(); clearTimeout(blinkTimer); clearTimeout(driftTimer);
+  stopSpeech(); stopRec(); clearTimeout(blinkTimer); clearTimeout(driftTimer);
   show('debrief');
   $('dbScenario').textContent=S.scenario.title; $('dbHeadline').textContent='Scoring your conversation…'; $('dbOverall').textContent='';
   $('spikes').innerHTML=''; $('moments').innerHTML=''; $('dbStrengths').innerHTML=''; $('dbPatient').textContent=''; $('dbNext').textContent=''; $('dbErr').style.display='none';
@@ -664,7 +738,7 @@ $('btnAgain').onclick=()=>startScenario(S.scenario.id);
 $('btnOther').onclick=()=>show('home');
 
 /* ---------------- init ---------------- */
-renderScenarios(); setupRecognition(); renderFace();
+renderScenarios(); setupRecognition(); renderFace(); loadElVoices();
 </script>
 </body>
 </html>
