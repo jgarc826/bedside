@@ -17,3 +17,7 @@ No backend, no build step. Voice input and output use the browser's Web Speech A
 Med schools pay roughly $100–200 per student per practice encounter with a paid actor (a "standardized patient"). Students get one to three reps in four years. A Bedside session costs a few cents.
 
 See `PITCH.md` for the pitch and demo flow.
+
+## Credits
+
+Patient avatars are composed from the open-source [notion-avatar](https://github.com/Mayandev/notion-avatar) part library (MIT). Parts are swapped live to reflect the patient's emotional state.
