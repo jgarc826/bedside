@@ -211,6 +211,7 @@
     <div class="subrow">
       <a id="typeToggle">type instead</a>
       <label><input type="checkbox" id="instrToggle"> instructor view</label>
+      <label id="voiceWrap" style="display:none">voice <select id="voiceSel" style="font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:8px;background:#fff"></select></label>
     </div>
     <div class="composer" id="composer">
       <textarea id="input" placeholder="Type what you'd say…" rows="1"></textarea>
@@ -538,16 +539,28 @@ async function loadElVoices(){
     const j = await r.json(); EL.voices = j.voices||[];
     const st=$('elStatus'); if (st) st.textContent = 'ElevenLabs connected · '+EL.voices.length+' voices available.';
     return EL.voices;
-  } catch(e){ const st=$('elStatus'); if (st) st.textContent='ElevenLabs key not working: '+e.message; return null; }
+  } catch(e){ const st=$('elStatus'); if (st) st.textContent='ElevenLabs key not working ('+e.message+'). Create a key without restrictions.'; return null; }
 }
+function usableVoices(){ const vs=EL.voices||[]; const pre=vs.filter(v=>v.category==='premade'||v.category==='cloned'||v.category==='generated'); return pre.length?pre:vs; }
 function pickElVoice(sc){
+  const saved = localStorage.getItem('bedside_voice_'+sc.id); if (saved) return saved;
   if (sc.elVoice) return sc.elVoice;
-  const vs = EL.voices||[]; const g = sc.voice;
+  const vs = usableVoices(); const g = sc.voice;
   const byGender = vs.filter(v=>(v.labels?.gender||'').toLowerCase()===g);
   const older = byGender.filter(v=>/old|middle/.test((v.labels?.age||'').toLowerCase()));
   const pool = (sc.age>=60 && older.length) ? older : byGender.length ? byGender : vs;
   const american = pool.filter(v=>/american/.test((v.labels?.accent||'').toLowerCase()));
   return (american[0]||pool[0]||{}).voice_id || null;
+}
+async function renderVoicePicker(sc){
+  const wrap=$('voiceWrap'), sel=$('voiceSel');
+  if (!elKey()) { wrap.style.display='none'; return; }
+  await loadElVoices();
+  const vs = usableVoices(); if (!vs.length) { wrap.style.display='none'; return; }
+  const cur = pickElVoice(sc);
+  sel.innerHTML = vs.map(v=>`<option value="${v.voice_id}" ${v.voice_id===cur?'selected':''}>${escapeHtml(v.name)}${v.labels?.gender?' · '+v.labels.gender:''}${v.labels?.age?' · '+v.labels.age:''}</option>`).join('');
+  sel.onchange=()=>{ localStorage.setItem('bedside_voice_'+sc.id, sel.value); speak('Okay. Is this better?', S.emotion); };
+  wrap.style.display='flex';
 }
 function stopElAudio(){
   cancelAnimationFrame(EL.raf); EL.raf=null;
@@ -561,7 +574,7 @@ async function speakEl(text, emotion){
   const body = { text, model_id:'eleven_turbo_v2_5', voice_settings:{ stability: heavy?0.3:0.5, similarity_boost:0.8, style: heavy?0.45:0.2, use_speaker_boost:true } };
   const r = await fetch('https://api.elevenlabs.io/v1/text-to-speech/'+voiceId+'?output_format=mp3_44100_128', {
     method:'POST', headers:{'xi-api-key':key,'content-type':'application/json','accept':'audio/mpeg'}, body: JSON.stringify(body) });
-  if (!r.ok) throw new Error('ElevenLabs '+r.status);
+  if (!r.ok) { let m='ElevenLabs '+r.status; try{ const j=await r.json(); m+=' '+(j.detail?.message||j.detail?.status||''); }catch{} $('encErr').textContent=m+' — using browser voice.'; $('encErr').style.display='block'; throw new Error(m); }
   const blob = await r.blob(); const url = URL.createObjectURL(blob);
   const audio = new Audio(url); audio.crossOrigin='anonymous'; EL.audio=audio;
   // amplitude-driven lip sync
@@ -663,6 +676,7 @@ function startScenario(id){
   $('ptRole').textContent = sc.role; $('ptFacts').textContent = sc.facts;
   $('input').value=''; $('encErr').style.display='none'; $('interim').textContent='';
   applyLook(sc.look);
+  renderVoicePicker(sc);
   const first = { say: sc.opening, emotion:'anxious', trust:55, inner:'Please let this be nothing.' };
   S.messages.push({role:'assistant', content: JSON.stringify(first)});
   show('encounter');
