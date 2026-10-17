@@ -50,8 +50,8 @@ Step 2 CS, the national communication skills exam, was cancelled in 2021. There 
 # Demo flow for the video (2 min)
 
 1. Home screen. Three scenarios. Say: "Pick the one every student dreads."
-2. Click the pancreatic cancer scenario. The patient speaks first.
-3. Do it WRONG first, briefly: jump straight to "So the biopsy showed adenocarcinoma, we'll get you to oncology." Toggle Instructor View and show trust dropping and her inner thought.
-4. Click Restart. Do it right: ask what she understands, warning shot, plain language, pause, name the emotion, next step. Show trust climbing.
+2. Click the pancreatic cancer scenario. Linda's face fills the screen and she speaks first. Say: "No transcript. You're looking at her, like you would be."
+3. Do it WRONG first, briefly: jump straight to "So the biopsy showed adenocarcinoma, we'll get you to oncology." Watch her face shut down: head turns away, eyes drop, mouth tightens. Toggle instructor view to show trust dropping and her inner thought.
+4. Click Restart. Do it right: ask what she understands, warning shot, plain language, pause, name the emotion, next step. Show her face come back to you and trust climbing.
 5. End conversation. Let the scorecard load. Point at a "fix" moment that quotes your own words.
 6. Scroll to the cost line: this session vs. $120.
